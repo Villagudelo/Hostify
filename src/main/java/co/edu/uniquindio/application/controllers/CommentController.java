@@ -25,4 +25,13 @@ public class CommentController {
         CommentDTO comment = commentService.createComment(dto, email);
         return ResponseEntity.ok(new ResponseDTO<>(false, comment));
     }
+
+    @PatchMapping("/reply")
+    public ResponseEntity<ResponseDTO<String>> replyToComment(
+            @RequestBody ReplyCommentDTO dto,
+            Principal principal) throws Exception {
+        String email = principal.getName();
+        commentService.replyToComment(dto, email);
+        return ResponseEntity.ok(new ResponseDTO<>(false, "Respuesta enviada correctamente"));
+    }
 }

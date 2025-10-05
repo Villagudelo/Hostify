@@ -37,4 +37,7 @@ public class Comment {
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(length = 500)
+    private String hostReply;
 }

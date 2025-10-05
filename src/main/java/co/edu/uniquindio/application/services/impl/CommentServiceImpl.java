@@ -58,4 +58,19 @@ public class CommentServiceImpl implements CommentService {
                 comment.getCreatedAt()
         );
     }
+
+    @Override
+    public void replyToComment(ReplyCommentDTO dto, String email) throws Exception {
+        Comment comment = commentRepository.findById(dto.commentId())
+            .orElseThrow(() -> new ValidationException("Comentario no encontrado"));
+
+        // Validar que el usuario autenticado es el anfitrión del alojamiento
+        User host = comment.getPlace().getHost();
+        if (!host.getEmail().equals(email)) {
+            throw new ValidationException("Solo el anfitrión puede responder este comentario");
+        }
+
+        comment.setHostReply(dto.reply());
+        commentRepository.save(comment);
+    }
 }

@@ -53,6 +53,10 @@ public class Place {
     @Column(nullable = false)
     private int maxGuests;
 
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User host;
+
     // Método para obtener la imagen principal
     public String getMainImage() {
         return (images != null && !images.isEmpty()) ? images.get(0) : null;
