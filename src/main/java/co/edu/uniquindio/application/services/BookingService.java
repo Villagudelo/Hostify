@@ -6,6 +6,7 @@ import co.edu.uniquindio.application.dto.booking.ItemBookingDTO;
 import co.edu.uniquindio.application.dto.booking.StatusBookingDTO;
 import co.edu.uniquindio.application.model.enums.BookingStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingService {
@@ -22,4 +23,5 @@ public interface BookingService {
 
     void cancelBooking(Long bookingId, String email) throws Exception;
 
+    List<ItemBookingDTO> getBookingsByPlace(Long placeId, BookingStatus status,LocalDateTime from,LocalDateTime to, String hostEmail) throws Exception;
 }

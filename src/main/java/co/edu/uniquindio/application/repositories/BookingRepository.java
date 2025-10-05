@@ -41,4 +41,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         AND b.checkIn >= :from AND b.checkOut <= :to
     """)
     int countBookingsByPlaceAndDates(Long placeId, LocalDateTime from, LocalDateTime to);
+
+    @Query("""
+        SELECT b FROM Booking b
+        WHERE b.place.id = :placeId
+        AND (:status IS NULL OR b.status = :status)
+        AND (:from IS NULL OR b.checkIn >= :from)
+        AND (:to IS NULL OR b.checkOut <= :to)
+        ORDER BY b.checkIn DESC
+    """)
+    List<Booking> findBookingsByPlaceAndFilters(Long placeId, BookingStatus status, LocalDateTime from, LocalDateTime to);
 }

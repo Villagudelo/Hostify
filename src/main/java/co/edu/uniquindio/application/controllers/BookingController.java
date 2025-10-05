@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -44,6 +45,19 @@ public class BookingController {
     ) throws Exception {
         String email = principal.getName();
         List<ItemBookingDTO> bookings = bookingService.getBookingsUser(email, status);
+        return ResponseEntity.ok(new ResponseDTO<>(false, bookings));
+    }
+
+    @GetMapping("/place/{placeId}")
+    public ResponseEntity<ResponseDTO<List<ItemBookingDTO>>> getBookingsByPlace(
+            @PathVariable Long placeId,
+            @RequestParam(required = false) BookingStatus status,
+            @RequestParam(required = false) LocalDateTime from,
+            @RequestParam(required = false) LocalDateTime to,
+            Principal principal
+    ) throws Exception {
+        String hostEmail = principal.getName();
+        List<ItemBookingDTO> bookings = bookingService.getBookingsByPlace(placeId, status, from, to, hostEmail);
         return ResponseEntity.ok(new ResponseDTO<>(false, bookings));
     }
 }

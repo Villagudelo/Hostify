@@ -1,6 +1,7 @@
 package co.edu.uniquindio.application.services.impl;
 
 import co.edu.uniquindio.application.dto.booking.*;
+import co.edu.uniquindio.application.exceptions.NotFoundException;
 import co.edu.uniquindio.application.exceptions.ValidationException;
 import co.edu.uniquindio.application.model.entity.*;
 import co.edu.uniquindio.application.model.enums.BookingStatus;
@@ -110,6 +111,38 @@ public class BookingServiceImpl implements BookingService {
                 b.getGuestCount(),
                 b.getPlace().getPrice(),
                 b.getStatus().name()
+        )).toList();
+    }
+
+    @Override
+    public List<ItemBookingDTO> getBookingsByPlace(
+            Long placeId,
+            BookingStatus status,
+            LocalDateTime from,
+            LocalDateTime to,
+            String hostEmail
+    ) throws Exception {
+        Place place = placeRepository.findById(placeId)
+            .orElseThrow(() -> new NotFoundException("Alojamiento no encontrado"));
+
+        // Validar que el usuario autenticado es el anfitrión
+        if (!place.getHost().getEmail().equals(hostEmail)) {
+            throw new ValidationException("Solo el anfitrión puede ver las reservas de su alojamiento");
+        }
+
+        List<Booking> bookings = bookingRepository.findBookingsByPlaceAndFilters(placeId, status, from, to);
+
+        return bookings.stream().map(b -> new ItemBookingDTO(
+            b.getId(),
+            b.getPlace().getId(),
+            b.getPlace().getTitle(),
+            b.getPlace().getCity(),
+            b.getCreatedAt(),
+            b.getCheckIn(),
+            b.getCheckOut(),
+            b.getGuestCount(),
+            b.getPlace().getPrice(),
+            b.getStatus().name()
         )).toList();
     }
 }
