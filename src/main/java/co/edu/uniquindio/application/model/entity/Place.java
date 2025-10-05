@@ -37,4 +37,27 @@ public class Place {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
+    
+    @Column(nullable = false, length = 100)
+    private String city;
+
+    @Column(nullable = false, length = 200)
+    private String address;
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
+
+    // Método para obtener la imagen principal
+    public String getMainImage() {
+        return (images != null && !images.isEmpty()) ? images.get(0) : null;
+    }
+
+    // Método para obtener el rating (puedes implementar la lógica real después)
+    public Double getRating() {
+        // Por ahora retorna null o un valor fijo, luego puedes calcular el promedio de comentarios
+        return null;
+    }  
 }

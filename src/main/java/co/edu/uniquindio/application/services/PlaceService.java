@@ -16,4 +16,6 @@ public interface PlaceService {
     MetricsDTO getMetricsById(Long id) throws Exception;
 
     List<ItemPlaceDTO> getPlacesUser(String id) throws Exception;
+
+    List<ItemPlaceDTO> searchPlaces(SearchPlaceDTO searchDTO) throws Exception;
 }
