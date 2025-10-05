@@ -18,4 +18,7 @@ public interface BookingService {
     List<ItemBookingDTO> getBookings(Long placeId) throws Exception;
 
     List<ItemBookingDTO> getBookingsUser(String userId) throws Exception;   
+
+    void cancelBooking(Long bookingId, String email) throws Exception;
+
 }

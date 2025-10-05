@@ -24,4 +24,13 @@ public class BookingController {
         bookingService.create(createBookingDTO, email);
         return ResponseEntity.ok(new ResponseDTO<>(false, "Reserva creada correctamente"));
     }
+
+    @PatchMapping("/cancel/{bookingId}")
+    public ResponseEntity<ResponseDTO<String>> cancelBooking(
+            @PathVariable Long bookingId,
+            Principal principal) throws Exception {
+        String email = principal.getName();
+        bookingService.cancelBooking(bookingId, email);
+        return ResponseEntity.ok(new ResponseDTO<>(false, "Reserva cancelada correctamente"));
+    }
 }

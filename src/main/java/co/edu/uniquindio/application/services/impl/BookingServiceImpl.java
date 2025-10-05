@@ -62,6 +62,26 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public void cancelBooking(Long bookingId, String email) throws Exception {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ValidationException("Reserva no encontrada"));
+
+        // Validar que la reserva pertenece al usuario autenticado
+        if (!booking.getGuest().getEmail().equals(email)) {
+            throw new ValidationException("No puedes cancelar reservas de otros usuarios");
+        }
+
+        // Validar política de cancelación (mínimo 48h antes del check-in)
+        LocalDateTime now = LocalDateTime.now();
+        if (booking.getCheckIn().minusHours(48).isBefore(now)) {
+            throw new ValidationException("Solo puedes cancelar reservas hasta 48 horas antes del check-in");
+        }
+
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+    }
+
+    @Override
     public void changeStatus(Long id, StatusBookingDTO statusBookingDTO) throws Exception {
 
     }
