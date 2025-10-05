@@ -60,4 +60,7 @@ public class Place {
         // Por ahora retorna null o un valor fijo, luego puedes calcular el promedio de comentarios
         return null;
     }  
+
+    @Column(nullable = false)
+    private int maxGuests;
 }

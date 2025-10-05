@@ -1,0 +1,23 @@
+package co.edu.uniquindio.application.repositories;
+
+import co.edu.uniquindio.application.model.entity.Booking;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public interface BookingRepository extends JpaRepository<Booking, Long> {
+
+    @Query("""
+        SELECT b FROM Booking b
+        WHERE b.place.id = :placeId
+        AND b.status = co.edu.uniquindio.application.model.enums.BookingStatus.CONFIRMED
+        AND (
+            (:checkIn BETWEEN b.checkIn AND b.checkOut)
+            OR (:checkOut BETWEEN b.checkIn AND b.checkOut)
+            OR (b.checkIn BETWEEN :checkIn AND :checkOut)
+        )
+    """)
+    List<Booking> findOverlappingBookings(Long placeId, LocalDateTime checkIn, LocalDateTime checkOut);
+}

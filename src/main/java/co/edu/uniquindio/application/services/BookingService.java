@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface BookingService {
 
-    void create(CreateBookingDTO createBookingDTO) throws Exception;
+    void create(CreateBookingDTO createBookingDTO, String email) throws Exception;
 
     void changeStatus(Long id, StatusBookingDTO statusBookingDTO) throws Exception;
 
@@ -17,5 +17,5 @@ public interface BookingService {
 
     List<ItemBookingDTO> getBookings(Long placeId) throws Exception;
 
-    List<ItemBookingDTO> getBookingsUser(String userId) throws Exception;
+    List<ItemBookingDTO> getBookingsUser(String userId) throws Exception;   
 }

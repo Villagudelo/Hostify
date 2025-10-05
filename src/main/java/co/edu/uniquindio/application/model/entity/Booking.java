@@ -34,4 +34,13 @@ public class Booking {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private LocalDateTime checkIn;
+
+    @Column(nullable = false)
+    private LocalDateTime checkOut;
+
+    @Column(nullable = false)
+    private int guestCount;
+
 }
