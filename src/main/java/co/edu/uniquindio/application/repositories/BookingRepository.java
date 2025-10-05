@@ -20,4 +20,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         )
     """)
     List<Booking> findOverlappingBookings(Long placeId, LocalDateTime checkIn, LocalDateTime checkOut);
+
+    @Query("""
+        SELECT b FROM Booking b
+        WHERE b.guest.email = :email
+        AND (:status IS NULL OR b.status = :status)
+        ORDER BY b.checkIn DESC
+    """)
+    List<Booking> findBookingsByUserAndStatus(String email, co.edu.uniquindio.application.model.enums.BookingStatus status);
 }

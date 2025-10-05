@@ -97,7 +97,19 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<ItemBookingDTO> getBookingsUser(String userId) throws Exception {
-        return List.of();
+    public List<ItemBookingDTO> getBookingsUser(String email, BookingStatus status) throws Exception {
+        List<Booking> bookings = bookingRepository.findBookingsByUserAndStatus(email, status);
+        return bookings.stream().map(b -> new ItemBookingDTO(
+                b.getId(),
+                b.getPlace().getId(),
+                b.getPlace().getTitle(),
+                b.getPlace().getCity(),
+                b.getCreatedAt(),
+                b.getCheckIn(),
+                b.getCheckOut(),
+                b.getGuestCount(),
+                b.getPlace().getPrice(),
+                b.getStatus().name()
+        )).toList();
     }
 }

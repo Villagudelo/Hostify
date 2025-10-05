@@ -4,6 +4,7 @@ import co.edu.uniquindio.application.dto.booking.BookingDTO;
 import co.edu.uniquindio.application.dto.booking.CreateBookingDTO;
 import co.edu.uniquindio.application.dto.booking.ItemBookingDTO;
 import co.edu.uniquindio.application.dto.booking.StatusBookingDTO;
+import co.edu.uniquindio.application.model.enums.BookingStatus;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface BookingService {
 
     List<ItemBookingDTO> getBookings(Long placeId) throws Exception;
 
-    List<ItemBookingDTO> getBookingsUser(String userId) throws Exception;   
+    List<ItemBookingDTO> getBookingsUser(String email, BookingStatus status) throws Exception;   
 
     void cancelBooking(Long bookingId, String email) throws Exception;
 
