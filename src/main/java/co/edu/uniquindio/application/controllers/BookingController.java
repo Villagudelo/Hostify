@@ -60,4 +60,22 @@ public class BookingController {
         List<ItemBookingDTO> bookings = bookingService.getBookingsByPlace(placeId, status, from, to, hostEmail);
         return ResponseEntity.ok(new ResponseDTO<>(false, bookings));
     }
+
+    @PatchMapping("/approve/{bookingId}")
+    public ResponseEntity<ResponseDTO<String>> approveBooking(
+            @PathVariable Long bookingId,
+            Principal principal) throws Exception {
+        String hostEmail = principal.getName();
+        bookingService.approveBooking(bookingId, hostEmail);
+        return ResponseEntity.ok(new ResponseDTO<>(false, "Reserva aprobada correctamente"));
+    }
+
+    @PatchMapping("/reject/{bookingId}")
+    public ResponseEntity<ResponseDTO<String>> rejectBooking(
+            @PathVariable Long bookingId,
+            Principal principal) throws Exception {
+        String hostEmail = principal.getName();
+        bookingService.rejectBooking(bookingId, hostEmail);
+        return ResponseEntity.ok(new ResponseDTO<>(false, "Reserva rechazada correctamente"));
+    }
 }

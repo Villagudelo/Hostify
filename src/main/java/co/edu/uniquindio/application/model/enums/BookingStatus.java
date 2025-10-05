@@ -9,7 +9,8 @@ public enum BookingStatus {
     PENDING("Pendiente"),
     CONFIRMED("Confirmada"),
     CANCELLED("Cancelada"),
-    COMPLETED("Completada");
+    COMPLETED("Completada"),
+    REJECTED("Rechazada");
 
     private final String label;
 

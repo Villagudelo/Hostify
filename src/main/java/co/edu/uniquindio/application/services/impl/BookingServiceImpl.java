@@ -145,4 +145,39 @@ public class BookingServiceImpl implements BookingService {
             b.getStatus().name()
         )).toList();
     }
+
+    @Override
+    public void approveBooking(Long bookingId, String hostEmail) throws Exception {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
+
+        // Validar que el usuario autenticado es el anfitrión
+        if (!booking.getPlace().getHost().getEmail().equals(hostEmail)) {
+            throw new ValidationException("Solo el anfitrión puede aprobar la reserva");
+        }
+
+        if (!booking.getStatus().equals(BookingStatus.PENDING)) {
+            throw new ValidationException("Solo reservas pendientes pueden ser aprobadas");
+        }
+
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+    }
+
+    @Override
+    public void rejectBooking(Long bookingId, String hostEmail) throws Exception {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
+
+        if (!booking.getPlace().getHost().getEmail().equals(hostEmail)) {
+            throw new ValidationException("Solo el anfitrión puede rechazar la reserva");
+        }
+
+        if (!booking.getStatus().equals(BookingStatus.PENDING)) {
+            throw new ValidationException("Solo reservas pendientes pueden ser rechazadas");
+        }
+
+        booking.setStatus(BookingStatus.REJECTED);
+        bookingRepository.save(booking);
+    }
 }

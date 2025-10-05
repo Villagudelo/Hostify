@@ -24,4 +24,8 @@ public interface BookingService {
     void cancelBooking(Long bookingId, String email) throws Exception;
 
     List<ItemBookingDTO> getBookingsByPlace(Long placeId, BookingStatus status,LocalDateTime from,LocalDateTime to, String hostEmail) throws Exception;
+
+    void approveBooking(Long bookingId, String hostEmail) throws Exception;
+    
+    void rejectBooking(Long bookingId, String hostEmail) throws Exception;
 }
