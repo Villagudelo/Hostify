@@ -18,4 +18,6 @@ public interface PlaceService {
     List<ItemPlaceDTO> getPlacesUser(String id) throws Exception;
 
     List<ItemPlaceDTO> searchPlaces(SearchPlaceDTO searchDTO) throws Exception;
+
+    PlaceDetailDTO getPlaceDetail(Long placeId) throws Exception;
 }

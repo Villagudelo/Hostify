@@ -2,7 +2,6 @@ package co.edu.uniquindio.application.services;
 
 import co.edu.uniquindio.application.dto.user.*;
 
-import java.util.List;
 
 public interface UserService {
 

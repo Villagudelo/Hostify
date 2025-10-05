@@ -20,4 +20,10 @@ public class PlaceController {
         List<ItemPlaceDTO> results = placeService.searchPlaces(searchDTO);
         return ResponseEntity.ok(new ResponseDTO<>(false, results));
     }
+
+    @GetMapping("/detail/{placeId}")
+    public ResponseEntity<ResponseDTO<PlaceDetailDTO>> getPlaceDetail(@PathVariable Long placeId) throws Exception {
+        PlaceDetailDTO detail = placeService.getPlaceDetail(placeId);
+        return ResponseEntity.ok(new ResponseDTO<>(false, detail));
+    }
 }

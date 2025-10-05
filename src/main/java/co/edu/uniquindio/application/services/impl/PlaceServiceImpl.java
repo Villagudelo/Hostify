@@ -1,7 +1,12 @@
 package co.edu.uniquindio.application.services.impl;
 
+import co.edu.uniquindio.application.dto.Comment.CommentDTO;
 import co.edu.uniquindio.application.dto.place.*;
+import co.edu.uniquindio.application.exceptions.NotFoundException;
 import co.edu.uniquindio.application.model.entity.Place;
+import co.edu.uniquindio.application.model.enums.BookingStatus;
+import co.edu.uniquindio.application.repositories.BookingRepository;
+import co.edu.uniquindio.application.repositories.CommentRepository;
 import co.edu.uniquindio.application.repositories.PlaceRepository;
 import co.edu.uniquindio.application.services.PlaceService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +20,8 @@ import java.util.stream.Collectors;
 public class PlaceServiceImpl implements PlaceService {
 
     private final PlaceRepository placeRepository;
+    private final CommentRepository commentRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     public void create(CreatePlaceDTO placeDTO) throws Exception {
@@ -74,6 +81,42 @@ public class PlaceServiceImpl implements PlaceService {
             place.getMainImage()
         ))
         .collect(Collectors.toList());
+    }
+
+    @Override
+    public PlaceDetailDTO getPlaceDetail(Long placeId) throws Exception {
+        Place place = placeRepository.findById(placeId)
+            .orElseThrow(() -> new NotFoundException("Alojamiento no encontrado"));
+
+        List<CommentDTO> comments = commentRepository.findByPlaceId(placeId).stream()
+            .map(c -> new CommentDTO(
+                c.getId(),
+                c.getAuthor().getName(),
+                c.getRating(),
+                c.getText(),
+                c.getCreatedAt()
+            )).toList();
+
+        List<AvailabilityDTO> availability = bookingRepository.findByPlaceIdAndStatus(
+            placeId, BookingStatus.CONFIRMED
+        ).stream()
+            .map(b -> new AvailabilityDTO(b.getCheckIn(), b.getCheckOut()))
+            .toList();
+
+        return new PlaceDetailDTO(
+            place.getId(),
+            place.getTitle(),
+            place.getDescription(),
+            place.getCity(),
+            place.getAddress(),
+            place.getPrice(),
+            place.getMaxGuests(),
+            place.getImages(),
+            place.getLatitude(),
+            place.getLongitude(),
+            comments,
+            availability
+        );
     }
 
 }

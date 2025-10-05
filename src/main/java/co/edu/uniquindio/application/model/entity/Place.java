@@ -50,6 +50,9 @@ public class Place {
     @Column
     private Double longitude;
 
+    @Column(nullable = false)
+    private int maxGuests;
+
     // Método para obtener la imagen principal
     public String getMainImage() {
         return (images != null && !images.isEmpty()) ? images.get(0) : null;
@@ -61,6 +64,4 @@ public class Place {
         return null;
     }  
 
-    @Column(nullable = false)
-    private int maxGuests;
 }

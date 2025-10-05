@@ -1,6 +1,8 @@
 package co.edu.uniquindio.application.repositories;
 
 import co.edu.uniquindio.application.model.entity.Booking;
+import co.edu.uniquindio.application.model.enums.BookingStatus;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -28,4 +30,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         ORDER BY b.checkIn DESC
     """)
     List<Booking> findBookingsByUserAndStatus(String email, co.edu.uniquindio.application.model.enums.BookingStatus status);
+
+        // filepath: src/main/java/co/edu/uniquindio/application/repositories/BookingRepository.java
+    List<Booking> findByPlaceIdAndStatus(Long placeId, BookingStatus status);
 }

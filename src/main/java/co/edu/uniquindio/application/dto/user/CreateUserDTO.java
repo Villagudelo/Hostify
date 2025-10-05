@@ -1,6 +1,5 @@
 package co.edu.uniquindio.application.dto.user;
 
-import co.edu.uniquindio.application.model.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

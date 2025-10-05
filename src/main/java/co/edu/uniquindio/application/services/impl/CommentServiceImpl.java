@@ -18,8 +18,6 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
-    private final UserRepository userRepository;
-    private final PlaceRepository placeRepository;
 
     @Override
     public CommentDTO createComment(CreateCommentDTO dto, String email) throws Exception {
