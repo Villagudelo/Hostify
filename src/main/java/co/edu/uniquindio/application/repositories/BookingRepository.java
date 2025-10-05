@@ -33,4 +33,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
         // filepath: src/main/java/co/edu/uniquindio/application/repositories/BookingRepository.java
     List<Booking> findByPlaceIdAndStatus(Long placeId, BookingStatus status);
+
+    @Query("""
+        SELECT COUNT(b) FROM Booking b
+        WHERE b.place.id = :placeId
+        AND b.status = co.edu.uniquindio.application.model.enums.BookingStatus.CONFIRMED
+        AND b.checkIn >= :from AND b.checkOut <= :to
+    """)
+    int countBookingsByPlaceAndDates(Long placeId, LocalDateTime from, LocalDateTime to);
 }

@@ -12,6 +12,7 @@ import co.edu.uniquindio.application.services.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,8 +45,14 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    public MetricsDTO getMetricsById(Long id) throws Exception {
-        return null;
+    public MetricsDTO getMetricsById(Long placeId, LocalDateTime from, LocalDateTime to) throws Exception {
+        int totalBookings = bookingRepository.countBookingsByPlaceAndDates(placeId, from, to);
+        Double avgRating = commentRepository.averageRatingByPlaceAndDates(placeId, from, to);
+        int totalReviews = commentRepository.countReviewsByPlaceAndDates(placeId, from, to);
+
+        if (avgRating == null) avgRating = 0.0;
+
+        return new MetricsDTO(totalReviews, avgRating, totalBookings);
     }
 
     @Override

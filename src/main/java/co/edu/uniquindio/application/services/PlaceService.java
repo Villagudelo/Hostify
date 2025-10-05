@@ -1,6 +1,8 @@
 package co.edu.uniquindio.application.services;
 
 import co.edu.uniquindio.application.dto.place.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PlaceService {
@@ -13,7 +15,7 @@ public interface PlaceService {
 
     PlaceDTO getById(Long id) throws Exception;
 
-    MetricsDTO getMetricsById(Long id) throws Exception;
+    MetricsDTO getMetricsById(Long placeId, LocalDateTime from, LocalDateTime to) throws Exception;
 
     List<ItemPlaceDTO> getPlacesUser(String id) throws Exception;
 
