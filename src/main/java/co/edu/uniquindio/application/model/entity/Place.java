@@ -5,7 +5,6 @@ import co.edu.uniquindio.application.model.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -31,8 +30,10 @@ public class Place {
     @ElementCollection
     private List<String> images;
 
-    @ElementCollection
-    private Set<Service> services;
+    @ElementCollection(targetClass = Service.class)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "service")
+    private List<Service> services;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
