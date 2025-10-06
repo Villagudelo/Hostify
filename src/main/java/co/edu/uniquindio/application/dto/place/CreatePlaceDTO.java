@@ -19,6 +19,8 @@ public record CreatePlaceDTO(
         @NotNull float nightlyPrice,
         @Size(max = 10) List<String> imageUrls, 
         @Size(max = 10) List<MultipartFile> imageFiles,
-        @NotEmpty Set<Service> services
+        @NotEmpty Set<Service> services,
+        @NotNull Double latitude,
+        @NotNull Double longitude
 ) {
 }

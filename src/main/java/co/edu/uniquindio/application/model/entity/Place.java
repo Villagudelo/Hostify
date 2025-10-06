@@ -44,10 +44,10 @@ public class Place {
     @Column(nullable = false, length = 200)
     private String address;
 
-    @Column
+    @Column(nullable = false)
     private Double latitude;
 
-    @Column
+    @Column(nullable = false)
     private Double longitude;
 
     @Column(nullable = false)

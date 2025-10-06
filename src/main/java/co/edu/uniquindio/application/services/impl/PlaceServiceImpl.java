@@ -68,6 +68,8 @@ public class PlaceServiceImpl implements PlaceService {
         place.setHost(host);
         place.setStatus(co.edu.uniquindio.application.model.enums.Status.ACTIVE);
 
+        place.setLatitude(placeDTO.latitude());
+        place.setLongitude(placeDTO.longitude());
         placeRepository.save(place);
     }
 
@@ -90,6 +92,8 @@ public class PlaceServiceImpl implements PlaceService {
         place.setImages(placeDTO.images());
         place.setServices(placeDTO.services());
 
+        place.setLatitude(placeDTO.latitude());
+        place.setLongitude(placeDTO.longitude());
         placeRepository.save(place);
     }
 

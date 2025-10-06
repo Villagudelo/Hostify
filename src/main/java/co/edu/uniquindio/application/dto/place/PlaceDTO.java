@@ -9,6 +9,8 @@ public record PlaceDTO(
         float nightlyPrice,
         List<String> images,
         List<String> services,
-        String hostName
+        String hostName,
+        Double latitude,
+        Double longitude
 ) {
 }

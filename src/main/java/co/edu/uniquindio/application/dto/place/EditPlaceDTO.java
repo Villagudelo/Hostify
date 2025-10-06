@@ -16,6 +16,8 @@ public record EditPlaceDTO(
         @NotNull float nightlyPrice,
         @NotEmpty List<String> images,
         @NotEmpty Set<Service> services,
-        @NotNull String address
+        @NotNull String address,
+        @NotNull Double latitude,
+        @NotNull Double longitude
 ) {
 }
