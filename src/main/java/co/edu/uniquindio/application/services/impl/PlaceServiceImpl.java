@@ -193,6 +193,13 @@ public class PlaceServiceImpl implements PlaceService {
             .map(b -> new AvailabilityDTO(b.getCheckIn(), b.getCheckOut()))
             .toList();
 
+        Double averageRating = commentRepository.averageRatingByPlaceAndDates(
+        placeId,
+        LocalDateTime.MIN,
+        LocalDateTime.MAX
+    );
+    if (averageRating == null) averageRating = 0.0;
+    
         return new PlaceDetailDTO(
             place.getId(),
             place.getTitle(),
@@ -204,8 +211,10 @@ public class PlaceServiceImpl implements PlaceService {
             place.getImages(),
             place.getLatitude(),
             place.getLongitude(),
+            place.getServices(),
             comments,
-            availability
+            availability,
+            averageRating
         );
     }
 }
