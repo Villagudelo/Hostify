@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,5 +38,33 @@ public class PlaceController {
     ) throws Exception {
         MetricsDTO metrics = placeService.getMetricsById(placeId, from, to);
         return ResponseEntity.ok(new ResponseDTO<>(false, metrics));
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<ResponseDTO<String>> createPlace(
+            @RequestBody CreatePlaceDTO placeDTO,
+            Principal principal) throws Exception {
+        String hostEmail = principal.getName();
+        placeService.create(placeDTO, hostEmail);
+        return ResponseEntity.ok(new ResponseDTO<>(false, "Alojamiento creado correctamente"));
+    }
+
+    @PatchMapping("/delete/{id}")
+    public ResponseEntity<ResponseDTO<String>> deletePlace(
+            @PathVariable Long id,
+            Principal principal) throws Exception {
+        String hostEmail = principal.getName();
+        placeService.delete(id, hostEmail);
+        return ResponseEntity.ok(new ResponseDTO<>(false, "Alojamiento eliminado correctamente"));
+    }
+
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<ResponseDTO<String>> editPlace(
+            @PathVariable Long id,
+            @RequestBody EditPlaceDTO placeDTO,
+            Principal principal) throws Exception {
+        String hostEmail = principal.getName();
+        placeService.edit(id, placeDTO, hostEmail);
+        return ResponseEntity.ok(new ResponseDTO<>(false, "Alojamiento editado correctamente"));
     }
 }

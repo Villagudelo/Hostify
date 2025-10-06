@@ -51,4 +51,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         ORDER BY b.checkIn DESC
     """)
     List<Booking> findBookingsByPlaceAndFilters(Long placeId, BookingStatus status, LocalDateTime from, LocalDateTime to);
+
+    @Query("""
+        SELECT COUNT(b) FROM Booking b
+        WHERE b.place.id = :placeId
+        AND (b.status = co.edu.uniquindio.application.model.enums.BookingStatus.CONFIRMED
+            OR b.status = co.edu.uniquindio.application.model.enums.BookingStatus.PENDING)
+        AND b.checkIn > :now
+    """)
+    int countFutureBookings(Long placeId, LocalDateTime now);
 }

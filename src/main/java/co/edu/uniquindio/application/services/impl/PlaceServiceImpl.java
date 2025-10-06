@@ -4,10 +4,12 @@ import co.edu.uniquindio.application.dto.Comment.CommentDTO;
 import co.edu.uniquindio.application.dto.place.*;
 import co.edu.uniquindio.application.exceptions.NotFoundException;
 import co.edu.uniquindio.application.model.entity.Place;
+import co.edu.uniquindio.application.model.entity.User;
 import co.edu.uniquindio.application.model.enums.BookingStatus;
 import co.edu.uniquindio.application.repositories.BookingRepository;
 import co.edu.uniquindio.application.repositories.CommentRepository;
 import co.edu.uniquindio.application.repositories.PlaceRepository;
+import co.edu.uniquindio.application.repositories.UserRepository;
 import co.edu.uniquindio.application.services.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,20 +25,71 @@ public class PlaceServiceImpl implements PlaceService {
     private final PlaceRepository placeRepository;
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public void create(CreatePlaceDTO placeDTO) throws Exception {
+    public void create(CreatePlaceDTO placeDTO, String hostEmail) throws Exception {
+        User host = userRepository.findByEmail(hostEmail)
+            .orElseThrow(() -> new NotFoundException("Anfitrión no encontrado"));
 
+        Place place = new Place();
+        place.setTitle(placeDTO.title());
+        place.setDescription(placeDTO.description());
+        place.setMaxGuests(placeDTO.maxGuests());
+        place.setPrice(placeDTO.nightlyPrice());
+        place.setImages(placeDTO.images());
+        place.setServices(placeDTO.services());
+        place.setHost(host);
+        place.setStatus(co.edu.uniquindio.application.model.enums.Status.ACTIVE);
+
+        placeRepository.save(place);
     }
 
     @Override
-    public void edit(Long id, EditPlaceDTO placeDTO) throws Exception {
+    public void edit(Long id, EditPlaceDTO placeDTO, String hostEmail) throws Exception {
+        Place place = placeRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Alojamiento no encontrado"));
 
+        // Validar que el usuario autenticado es el anfitrión
+        if (!place.getHost().getEmail().equals(hostEmail)) {
+            throw new co.edu.uniquindio.application.exceptions.ValidationException(
+                "Solo el anfitrión puede editar este alojamiento"
+            );
+        }
+
+        place.setTitle(placeDTO.title());
+        place.setDescription(placeDTO.description());
+        place.setMaxGuests(placeDTO.maxGuests());
+        place.setPrice(placeDTO.nightlyPrice());
+        place.setImages(placeDTO.images());
+        place.setServices(placeDTO.services());
+
+        placeRepository.save(place);
     }
 
     @Override
-    public void delete(Long id) throws Exception {
+    public void delete(Long id, String hostEmail) throws Exception {
+        Place place = placeRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Alojamiento no encontrado"));
 
+        // Validar que el usuario autenticado es el anfitrión
+        if (!place.getHost().getEmail().equals(hostEmail)) {
+            throw new co.edu.uniquindio.application.exceptions.ValidationException(
+                "Solo el anfitrión puede eliminar este alojamiento"
+            );
+        }
+
+        // Validar que no existan reservas futuras (CONFIRMED o PENDING)
+        int futureBookings = bookingRepository.countFutureBookings(id, LocalDateTime.now());
+        if (futureBookings > 0) {
+            throw new co.edu.uniquindio.application.exceptions.ValidationException(
+                "No puedes eliminar el alojamiento porque tiene reservas futuras"
+            );
+        }
+
+        // Soft delete: cambiar estado a ELIMINATED
+        place.setStatus(co.edu.uniquindio.application.model.enums.Status.ELIMINATED);
+        placeRepository.save(place);
     }
 
     @Override
