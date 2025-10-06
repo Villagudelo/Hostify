@@ -37,7 +37,7 @@ dependencies {
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
     implementation 'org.springframework.security:spring-security-crypto'
-
+    implementation 'com.cloudinary:cloudinary-http44:1.34.0'
 }
 
 tasks.named('test') {

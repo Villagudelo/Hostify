@@ -3,6 +3,7 @@ package co.edu.uniquindio.application.services.impl;
 import co.edu.uniquindio.application.dto.Comment.CommentDTO;
 import co.edu.uniquindio.application.dto.place.*;
 import co.edu.uniquindio.application.exceptions.NotFoundException;
+import co.edu.uniquindio.application.exceptions.ValidationException;
 import co.edu.uniquindio.application.model.entity.Place;
 import co.edu.uniquindio.application.model.entity.User;
 import co.edu.uniquindio.application.model.enums.BookingStatus;
@@ -10,11 +11,13 @@ import co.edu.uniquindio.application.repositories.BookingRepository;
 import co.edu.uniquindio.application.repositories.CommentRepository;
 import co.edu.uniquindio.application.repositories.PlaceRepository;
 import co.edu.uniquindio.application.repositories.UserRepository;
+import co.edu.uniquindio.application.services.ImageService;
 import co.edu.uniquindio.application.services.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,9 +29,32 @@ public class PlaceServiceImpl implements PlaceService {
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
+    private final ImageService imageService;
 
     @Override
     public void create(CreatePlaceDTO placeDTO, String hostEmail) throws Exception {
+        List<String> finalImages = new ArrayList<>();
+
+        if (placeDTO.imageFiles() != null && !placeDTO.imageFiles().isEmpty()) {
+            if (placeDTO.imageFiles().size() > 10) {
+                throw new ValidationException("Máximo 10 imágenes permitidas");
+            }
+            List<String> uploadedUrls = imageService.uploadImages(placeDTO.imageFiles());
+            finalImages.addAll(uploadedUrls);
+        }
+
+        if (placeDTO.imageUrls() != null && !placeDTO.imageUrls().isEmpty()) {
+            if (placeDTO.imageUrls().size() > 10) {
+                throw new ValidationException("Máximo 10 imágenes permitidas");
+            }
+            finalImages.addAll(placeDTO.imageUrls());
+        }
+
+        if (finalImages.size() < 1 || finalImages.size() > 10) {
+            throw new ValidationException("Debes subir entre 1 y 10 imágenes");
+        }
+        
+    
         User host = userRepository.findByEmail(hostEmail)
             .orElseThrow(() -> new NotFoundException("Anfitrión no encontrado"));
 
@@ -37,7 +63,7 @@ public class PlaceServiceImpl implements PlaceService {
         place.setDescription(placeDTO.description());
         place.setMaxGuests(placeDTO.maxGuests());
         place.setPrice(placeDTO.nightlyPrice());
-        place.setImages(placeDTO.images());
+        place.setImages(finalImages);
         place.setServices(placeDTO.services());
         place.setHost(host);
         place.setStatus(co.edu.uniquindio.application.model.enums.Status.ACTIVE);
@@ -178,5 +204,4 @@ public class PlaceServiceImpl implements PlaceService {
             availability
         );
     }
-
 }
