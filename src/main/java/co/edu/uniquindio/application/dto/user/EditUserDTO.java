@@ -10,6 +10,8 @@ public record EditUserDTO(
         @NotBlank @Length(max = 100) String name,
         @Length(max = 10) String phone,
         @Length(max = 300) String photoUrl,
-        @NotNull LocalDate dateBirth
+        @NotNull LocalDate dateBirth,
+        @Length(max = 500) String description,
+        @Length(max = 200) String legalDocumentUrl
 ) {
 }

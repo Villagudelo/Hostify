@@ -70,13 +70,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void edit(String id, EditUserDTO userDTO) throws Exception {
-        // Recuperar el usuario desde la base de datos
         User user = getUserById(id);
 
-        // MapStruct se encarga de copiar los valores
-        userMapper.updateUserFromDto(userDTO, user);
+        user.setName(userDTO.name());
+        user.setPhone(userDTO.phone());
+        user.setPhotoUrl(userDTO.photoUrl());
+        user.setDateBirth(userDTO.dateBirth());
+        user.setDescription(userDTO.description());
+        user.setLegalDocumentUrl(userDTO.legalDocumentUrl());
 
-        // Se guarda el usuario con los nuevos datos
         userRepository.save(user);
     }
 

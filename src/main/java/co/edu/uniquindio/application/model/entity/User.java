@@ -47,5 +47,11 @@ public class User {
     @Column(nullable = false)
     private Status status;
 
+    @Column(length = 500)
+    private String description;
+
+    @Column(length = 200)
+    private String legalDocumentUrl;
+
 
 }

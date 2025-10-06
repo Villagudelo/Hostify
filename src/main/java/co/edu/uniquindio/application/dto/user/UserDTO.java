@@ -7,6 +7,8 @@ public record UserDTO(
         String name,
         String email,
         String photoUrl,
-        Role role
+        Role role,
+        String description,
+        String legalDocumentUrl
 ) {
 }
