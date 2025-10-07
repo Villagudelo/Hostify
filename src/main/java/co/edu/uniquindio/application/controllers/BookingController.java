@@ -41,12 +41,14 @@ public class BookingController {
     @GetMapping("/history")
     public ResponseEntity<ResponseDTO<List<ItemBookingDTO>>> getUserBookings(
             Principal principal,
-            @RequestParam(required = false) BookingStatus status
+            @RequestParam(required = false) BookingStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) throws Exception {
         String email = principal.getName();
-        List<ItemBookingDTO> bookings = bookingService.getBookingsUser(email, status);
+        List<ItemBookingDTO> bookings = bookingService.getBookingsUser(email, status, page, size);
         return ResponseEntity.ok(new ResponseDTO<>(false, bookings));
-    }
+}
 
     @GetMapping("/place/{placeId}")
     public ResponseEntity<ResponseDTO<List<ItemBookingDTO>>> getBookingsByPlace(
@@ -54,10 +56,12 @@ public class BookingController {
             @RequestParam(required = false) BookingStatus status,
             @RequestParam(required = false) LocalDateTime from,
             @RequestParam(required = false) LocalDateTime to,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             Principal principal
     ) throws Exception {
         String hostEmail = principal.getName();
-        List<ItemBookingDTO> bookings = bookingService.getBookingsByPlace(placeId, status, from, to, hostEmail);
+        List<ItemBookingDTO> bookings = bookingService.getBookingsByPlace(placeId, status, from, to, hostEmail, page, size);
         return ResponseEntity.ok(new ResponseDTO<>(false, bookings));
     }
 

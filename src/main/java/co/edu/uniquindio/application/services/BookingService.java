@@ -19,13 +19,13 @@ public interface BookingService {
 
     List<ItemBookingDTO> getBookings(Long placeId) throws Exception;
 
-    List<ItemBookingDTO> getBookingsUser(String email, BookingStatus status) throws Exception;   
-
     void cancelBooking(Long bookingId, String email) throws Exception;
-
-    List<ItemBookingDTO> getBookingsByPlace(Long placeId, BookingStatus status,LocalDateTime from,LocalDateTime to, String hostEmail) throws Exception;
 
     void approveBooking(Long bookingId, String hostEmail) throws Exception;
     
     void rejectBooking(Long bookingId, String hostEmail) throws Exception;
+
+    List<ItemBookingDTO> getBookingsUser(String email, BookingStatus status, int page, int size) throws Exception;
+
+    List<ItemBookingDTO> getBookingsByPlace(Long placeId, BookingStatus status, LocalDateTime from, LocalDateTime to, String hostEmail, int page, int size) throws Exception;
 }

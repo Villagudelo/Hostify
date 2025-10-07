@@ -6,6 +6,9 @@ import co.edu.uniquindio.application.model.enums.BookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -60,4 +63,24 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         AND b.checkIn > :now
     """)
     int countFutureBookings(Long placeId, LocalDateTime now);
+
+        // Listar reservas de usuario con paginación y filtro por estado
+    @Query("""
+        SELECT b FROM Booking b
+        WHERE b.guest.email = :email
+        AND (:status IS NULL OR b.status = :status)
+        ORDER BY b.checkIn DESC
+    """)
+    Page<Booking> findBookingsByUserAndStatusPaged(String email, BookingStatus status, Pageable pageable);
+
+    // Listar reservas de alojamiento con paginación y filtros
+    @Query("""
+        SELECT b FROM Booking b
+        WHERE b.place.id = :placeId
+        AND (:status IS NULL OR b.status = :status)
+        AND (:from IS NULL OR b.checkIn >= :from)
+        AND (:to IS NULL OR b.checkOut <= :to)
+        ORDER BY b.checkIn DESC
+    """)
+    Page<Booking> findBookingsByPlaceAndFiltersPaged(Long placeId, BookingStatus status, LocalDateTime from, LocalDateTime to, Pageable pageable);
 }

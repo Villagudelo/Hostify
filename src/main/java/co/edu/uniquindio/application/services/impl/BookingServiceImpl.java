@@ -9,6 +9,8 @@ import co.edu.uniquindio.application.repositories.*;
 import co.edu.uniquindio.application.services.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 
 
 import java.time.LocalDateTime;
@@ -98,8 +100,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<ItemBookingDTO> getBookingsUser(String email, BookingStatus status) throws Exception {
-        List<Booking> bookings = bookingRepository.findBookingsByUserAndStatus(email, status);
+    public List<ItemBookingDTO> getBookingsUser(String email, BookingStatus status, int page, int size) throws Exception {
+        Page<Booking> bookings = bookingRepository.findBookingsByUserAndStatusPaged(email, status, PageRequest.of(page, size));
         return bookings.stream().map(b -> new ItemBookingDTO(
                 b.getId(),
                 b.getPlace().getId(),
@@ -120,17 +122,18 @@ public class BookingServiceImpl implements BookingService {
             BookingStatus status,
             LocalDateTime from,
             LocalDateTime to,
-            String hostEmail
+            String hostEmail,
+            int page,
+            int size
     ) throws Exception {
         Place place = placeRepository.findById(placeId)
             .orElseThrow(() -> new NotFoundException("Alojamiento no encontrado"));
 
-        // Validar que el usuario autenticado es el anfitrión
         if (!place.getHost().getEmail().equals(hostEmail)) {
             throw new ValidationException("Solo el anfitrión puede ver las reservas de su alojamiento");
         }
 
-        List<Booking> bookings = bookingRepository.findBookingsByPlaceAndFilters(placeId, status, from, to);
+        Page<Booking> bookings = bookingRepository.findBookingsByPlaceAndFiltersPaged(placeId, status, from, to, PageRequest.of(page, size));
 
         return bookings.stream().map(b -> new ItemBookingDTO(
             b.getId(),
