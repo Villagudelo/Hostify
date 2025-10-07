@@ -19,4 +19,6 @@ public interface UserService {
 
     void resetPassword(ResetPasswordDTO resetPasswordDTO) throws Exception;
 
+    void updatePhoto(String id, String photoUrl) throws Exception;
+
 }

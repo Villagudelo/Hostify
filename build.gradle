@@ -38,6 +38,23 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
     implementation 'org.springframework.security:spring-security-crypto'
     implementation 'com.cloudinary:cloudinary-http44:1.34.0'
+    // Spring Boot Starter Mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // iText 7 Core para PDF
+    implementation 'com.itextpdf:itext7-core:7.2.5'
+
+    // Jakarta Mail
+    implementation 'com.sun.mail:jakarta.mail:2.0.1'
+
+    // Si usas Spring Boot 3.x, también necesitas:
+    implementation "jakarta.mail:jakarta.mail-api:2.1.1"
+
+    // Spring Security (para PasswordEncoder)
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // Validación (si no la tienes)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {

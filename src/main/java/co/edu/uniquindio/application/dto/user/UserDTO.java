@@ -2,13 +2,18 @@ package co.edu.uniquindio.application.dto.user;
 
 import co.edu.uniquindio.application.model.enums.Role;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public record UserDTO(
         String id,
         String name,
         String email,
+        String phone,
         String photoUrl,
-        Role role,
-        String description,
-        String legalDocumentUrl
+        LocalDate dateBirth,
+        LocalDateTime createdAt,
+        String role,
+        String status
 ) {
 }

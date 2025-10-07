@@ -8,6 +8,7 @@ import co.edu.uniquindio.application.mappers.UserMapper;
 import co.edu.uniquindio.application.model.entity.User;
 import co.edu.uniquindio.application.model.enums.Status;
 import co.edu.uniquindio.application.repositories.UserRepository;
+import co.edu.uniquindio.application.services.PasswordResetService;
 import co.edu.uniquindio.application.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,11 +24,23 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final PasswordResetService passwordResetService;
 
     @Override
     public void create(CreateUserDTO userDTO) throws Exception {
-        //Validación del email
-        if(isEmailDuplicated(userDTO.email())){
+
+        //Validacion del formato correcto del email
+        if (!emailValidation(userDTO.email())) {
+            throw new ValidationException("El formato del email no es válido");
+        }
+
+        // Validación de contraseña segura
+        if (!securePassword(userDTO.password())) {
+            throw new ValidationException("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número");
+        }
+
+        //Validación de que no exissta
+        if(isEmailDuplicated(userDTO.email())) {
             throw new ValueConflictException("El correo electrónico ya está en uso.");
         }
 
@@ -111,17 +124,24 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void resetPassword(ResetPasswordDTO resetPasswordDTO) throws Exception {
-        // Recuperar el usuario desde la base de datos
-        Optional<User> optionalUser = userRepository.findByEmail(resetPasswordDTO.email());
-
-        if(optionalUser.isEmpty()){
-            throw new NotFoundException("El usuario no existe");
+        // Validación de nueva contraseña segura
+        if (!securePassword(resetPasswordDTO.newPassword())) {
+            throw new ValidationException("La nueva contrast debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número");
         }
 
-        //TODO validar que el código que viene en el DTO sea igual al que se envió por email, y que no haya expirado. Luego actualizar la contraseña y eliminar el código usado.
-
+        passwordResetService.validateCodeAndResetPassword(
+                resetPasswordDTO.email(),
+                resetPasswordDTO.verificationCode(),
+                resetPasswordDTO.newPassword()
+        );
     }
 
+    @Override
+    public void updatePhoto(String id, String photoUrl) throws Exception {
+        User user = getUserById(id);
+        user.setPhotoUrl(photoUrl);
+        userRepository.save(user);
+    }
 
     @Override
     public TokenDTO login(LoginDTO loginDTO) throws Exception {
@@ -148,5 +168,18 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado."));
     }
+
+    private boolean securePassword(String password){
+        // Mínimo 8 caracteres, al menos una mayúscula y un número
+        String passwordRegex = "^(?=.*[A-Z])(?=.*\\d).{8,}$";
+        return password != null && password.matches(passwordRegex);
+    }
+
+    private boolean emailValidation(String email){
+        // Validación básica de formato email
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        return email != null && email.matches(emailRegex);
+    }
+
 
 }
