@@ -225,4 +225,12 @@ public class PlaceServiceImpl implements PlaceService {
             averageRating
         );
     }
+
+    @Override
+    public List<String> autocompleteCities(String prefix) throws Exception {
+        if (prefix == null || prefix.trim().isEmpty()) {
+            return List.of();
+        }
+        return placeRepository.findCitiesByPrefix(prefix.trim());
+    }
 }

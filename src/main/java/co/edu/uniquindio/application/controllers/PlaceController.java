@@ -2,6 +2,7 @@ package co.edu.uniquindio.application.controllers;
 
 import co.edu.uniquindio.application.dto.ResponseDTO;
 import co.edu.uniquindio.application.dto.place.*;
+import co.edu.uniquindio.application.services.FavoriteService;
 import co.edu.uniquindio.application.services.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 public class PlaceController {
 
     private final PlaceService placeService;
+    private final FavoriteService favoriteService;
 
     @PostMapping("/search")
     public ResponseEntity<ResponseDTO<List<ItemPlaceDTO>>> searchPlaces(@RequestBody SearchPlaceDTO searchDTO) throws Exception {
@@ -66,5 +68,35 @@ public class PlaceController {
         String hostEmail = principal.getName();
         placeService.edit(id, placeDTO, hostEmail);
         return ResponseEntity.ok(new ResponseDTO<>(false, "Alojamiento editado correctamente"));
+    }
+
+    @GetMapping("/autocomplete-city")
+    public ResponseEntity<ResponseDTO<List<String>>> autocompleteCity(@RequestParam String prefix) throws Exception {
+        List<String> cities = placeService.autocompleteCities(prefix);
+        return ResponseEntity.ok(new ResponseDTO<>(false, cities));
+    }
+
+    @PostMapping("/favorite/{placeId}")
+    public ResponseEntity<ResponseDTO<String>> addFavorite(@PathVariable Long placeId, Principal principal) throws Exception {
+        favoriteService.addFavorite(placeId, principal.getName());
+        return ResponseEntity.ok(new ResponseDTO<>(false, "Alojamiento marcado como favorito"));
+    }
+
+    @DeleteMapping("/favorite/{placeId}")
+    public ResponseEntity<ResponseDTO<String>> removeFavorite(@PathVariable Long placeId, Principal principal) throws Exception {
+        favoriteService.removeFavorite(placeId, principal.getName());
+        return ResponseEntity.ok(new ResponseDTO<>(false, "Alojamiento eliminado de favoritos"));
+    }
+
+    @GetMapping("/favorites")
+    public ResponseEntity<ResponseDTO<List<FavoriteDTO>>> getUserFavorites(Principal principal) throws Exception {
+        List<FavoriteDTO> favorites = favoriteService.getUserFavorites(principal.getName());
+        return ResponseEntity.ok(new ResponseDTO<>(false, favorites));
+    }
+
+    @GetMapping("/favorite-count/{placeId}")
+    public ResponseEntity<ResponseDTO<Integer>> getFavoriteCount(@PathVariable Long placeId) throws Exception {
+        int count = favoriteService.getFavoriteCount(placeId);
+        return ResponseEntity.ok(new ResponseDTO<>(false, count));
     }
 }

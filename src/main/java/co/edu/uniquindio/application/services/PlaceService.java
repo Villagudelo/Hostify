@@ -22,4 +22,6 @@ public interface PlaceService {
     List<ItemPlaceDTO> searchPlaces(SearchPlaceDTO searchDTO) throws Exception;
 
     PlaceDetailDTO getPlaceDetail(Long placeId) throws Exception;
+
+    List<String> autocompleteCities(String prefix) throws Exception;
 }

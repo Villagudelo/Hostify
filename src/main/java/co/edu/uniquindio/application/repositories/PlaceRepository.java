@@ -44,4 +44,11 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
         @Param("services") List<Service> services,
         @Param("confirmedStatus") BookingStatus confirmedStatus
     );
+
+    @Query("""
+        SELECT DISTINCT p.city FROM Place p
+        WHERE p.status = 'ACTIVE'
+        AND LOWER(p.city) LIKE LOWER(CONCAT(:prefix, '%'))
+    """)
+    List<String> findCitiesByPrefix(@Param("prefix") String prefix);
 }
