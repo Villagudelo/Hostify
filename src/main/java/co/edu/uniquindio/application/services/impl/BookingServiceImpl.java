@@ -7,6 +7,7 @@ import co.edu.uniquindio.application.model.entity.*;
 import co.edu.uniquindio.application.model.enums.BookingStatus;
 import co.edu.uniquindio.application.repositories.*;
 import co.edu.uniquindio.application.services.BookingService;
+import co.edu.uniquindio.application.services.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final PlaceRepository placeRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     @Override
     public void create(CreateBookingDTO createBookingDTO, String email) throws Exception {
@@ -62,6 +64,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setGuestCount(createBookingDTO.guestCount());
 
         bookingRepository.save(booking);
+        emailService.sendBookingConfirmation(guest.getEmail(), booking);
     }
 
     @Override

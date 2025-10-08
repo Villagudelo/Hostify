@@ -1,6 +1,7 @@
 package co.edu.uniquindio.application.services.impl;
 
 import co.edu.uniquindio.application.exceptions.ValidationException;
+import co.edu.uniquindio.application.model.entity.Booking;
 import co.edu.uniquindio.application.services.EmailService;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -170,6 +171,51 @@ public class EmailServiceImpl implements EmailService {
         } catch (Exception e) {
             log.error("Falló el envío de notificación de comentario: {}", e.getMessage());
             // No lanzamos excepción para no interrumpir el flujo principal
+        }
+    }
+
+    @Override
+    public void sendBookingConfirmation(String userEmail, Booking booking) {
+        log.info("Enviando confirmación de reserva a: {}", userEmail);
+        try {
+            emailValidator(userEmail);
+
+            String subject = "Confirmación de Reserva - Hostify";
+            String body = String.format(
+                "¡Hola %s!\n\nTu reserva en \"%s\" ha sido creada exitosamente.\n\n" +
+                "Detalles:\n" +
+                "- Ciudad: %s\n" +
+                "- Dirección: %s\n" +
+                "- Check-in: %s\n" +
+                "- Check-out: %s\n" +
+                "- Número de huéspedes: %d\n" +
+                "- Precio por noche: $%.2f\n\n" +
+                "Estado actual: %s\n\n" +
+                "Gracias por reservar con Hostify.",
+                booking.getGuest().getName(),
+                booking.getPlace().getTitle(),
+                booking.getPlace().getCity(),
+                booking.getPlace().getAddress(),
+                booking.getCheckIn().toLocalDate(),
+                booking.getCheckOut().toLocalDate(),
+                booking.getGuestCount(),
+                booking.getPlace().getPrice(),
+                booking.getStatus().name()
+            );
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
+
+            helper.setTo(userEmail);
+            helper.setSubject(subject);
+            helper.setText(body);
+            helper.setFrom("noreply@alojamientosapp.com");
+
+            mailSender.send(message);
+            log.info("Confirmación de reserva enviada correctamente a: {}", userEmail);
+
+        } catch (Exception e) {
+            log.error("Falló el envío de confirmación de reserva: {}", e.getMessage());
         }
     }
 }
