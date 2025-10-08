@@ -1,6 +1,5 @@
 package co.edu.uniquindio.application.dto.user;
 
-import co.edu.uniquindio.application.model.enums.Role;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

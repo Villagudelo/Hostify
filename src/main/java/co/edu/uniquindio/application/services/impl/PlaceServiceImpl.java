@@ -191,7 +191,8 @@ public class PlaceServiceImpl implements PlaceService {
                 c.getAuthor().getName(),
                 c.getRating(),
                 c.getText(),
-                c.getCreatedAt()
+                c.getCreatedAt(),
+                c.getHostReply()
             )).toList();
 
         List<AvailabilityDTO> availability = bookingRepository.findByPlaceIdAndStatus(

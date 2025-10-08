@@ -7,5 +7,6 @@ public record CommentDTO(
     String authorName,
     int rating,
     String text,
-    LocalDateTime createdAt
+    LocalDateTime createdAt,
+    String hostReply
 ) {}

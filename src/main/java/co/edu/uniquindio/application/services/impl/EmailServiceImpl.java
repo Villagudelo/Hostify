@@ -143,4 +143,33 @@ public class EmailServiceImpl implements EmailService {
 
         return outputStream.toByteArray();
     }
+
+    @Override
+    public void sendNewCommentNotification(String hostEmail, String guestName, String placeTitle, String commentText, int rating) {
+        log.info("Intentando enviar notificación de nuevo comentario a: {}", hostEmail);
+        try {
+            emailValidator(hostEmail);
+
+            String subject = "Nuevo comentario en tu alojamiento";
+            String body = String.format(
+                "¡Hola!\n\n%s ha dejado un nuevo comentario en tu alojamiento \"%s\":\n\n\"%s\"\n\nCalificación: %d estrellas.\n\nIngresa a Hostify para responder el comentario.",
+                guestName, placeTitle, commentText, rating
+            );
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
+
+            helper.setTo(hostEmail);
+            helper.setSubject(subject);
+            helper.setText(body);
+            helper.setFrom("noreply@alojamientosapp.com");
+
+            mailSender.send(message);
+            log.info("Notificación de comentario enviada correctamente a: {}", hostEmail);
+
+        } catch (Exception e) {
+            log.error("Falló el envío de notificación de comentario: {}", e.getMessage());
+            // No lanzamos excepción para no interrumpir el flujo principal
+        }
+    }
 }

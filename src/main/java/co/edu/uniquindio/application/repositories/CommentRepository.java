@@ -26,4 +26,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
         AND c.createdAt >= :from AND c.createdAt <= :to
     """)
     int countReviewsByPlaceAndDates(Long placeId, LocalDateTime from, LocalDateTime to);
+
+    @Query("SELECT c FROM Comment c WHERE c.place.id = :placeId ORDER BY c.createdAt DESC")
+    List<Comment> findByPlaceIdOrderByCreatedAtDesc(Long placeId);
+
+    @Query("SELECT AVG(c.rating) FROM Comment c WHERE c.place.id = :placeId")
+    Double findAverageRatingByPlaceId(Long placeId);
 }

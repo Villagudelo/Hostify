@@ -39,6 +39,7 @@ public class FileStorageService {
             }
 
             // Generar nombre único
+            @SuppressWarnings("null")
             String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
             String fileExtension = getFileExtension(originalFileName);
             String fileName = userId + "_" + System.currentTimeMillis() + fileExtension;

@@ -2,7 +2,6 @@ package co.edu.uniquindio.application.controllers;
 
 import co.edu.uniquindio.application.dto.user.*;
 import co.edu.uniquindio.application.dto.ResponseDTO;
-import co.edu.uniquindio.application.mappers.UserMapper;
 import co.edu.uniquindio.application.model.entity.User;
 import co.edu.uniquindio.application.model.enums.Status;
 import co.edu.uniquindio.application.repositories.UserRepository;
@@ -27,7 +26,6 @@ public class UserController {
     private final UserService userService;
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final PasswordResetService passwordResetService;
 
     @GetMapping("/{id}")
