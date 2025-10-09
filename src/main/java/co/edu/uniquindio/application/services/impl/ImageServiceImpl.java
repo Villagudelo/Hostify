@@ -33,4 +33,12 @@ public class ImageServiceImpl implements ImageService {
         }
         return urls;
     }
+
+    @Override
+    public String uploadDocument(MultipartFile file) throws Exception {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), 
+            ObjectUtils.asMap("resource_type", "auto", "folder", "legal_documents"));
+        return uploadResult.get("secure_url").toString();
+    }
 }

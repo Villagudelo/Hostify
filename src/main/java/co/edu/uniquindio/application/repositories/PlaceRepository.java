@@ -51,4 +51,12 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
         AND LOWER(p.city) LIKE LOWER(CONCAT(:prefix, '%'))
     """)
     List<String> findCitiesByPrefix(@Param("prefix") String prefix);
+
+    @Query("""
+        SELECT p FROM Place p
+        WHERE p.host.email = :hostEmail
+        AND p.status = 'ACTIVE'
+        ORDER BY p.id DESC
+    """)
+    List<Place> findByHostEmailAndActiveStatus(@Param("hostEmail") String hostEmail);
 }

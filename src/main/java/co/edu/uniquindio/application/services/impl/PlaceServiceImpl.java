@@ -139,8 +139,28 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    public List<ItemPlaceDTO> getPlacesUser(String id) throws Exception {
-        return List.of();
+    public List<ItemPlaceDTO> getPlacesUser(String hostEmail) throws Exception {
+        List<Place> places = placeRepository.findByHostEmailAndActiveStatus(hostEmail);
+        
+        return places.stream()
+            .map(place -> {
+                // Calcular rating promedio
+                Double averageRating = commentRepository.averageRatingByPlaceAndDates(
+                    place.getId(),
+                    LocalDateTime.MIN,
+                    LocalDateTime.MAX
+                );
+                
+                return new ItemPlaceDTO(
+                    place.getId(),
+                    place.getTitle(),
+                    place.getCity(),
+                    place.getPrice(),
+                    averageRating != null ? averageRating.floatValue() : 0f,
+                    place.getMainImage()
+                );
+            })
+            .collect(Collectors.toList());
     }
 
     @Override

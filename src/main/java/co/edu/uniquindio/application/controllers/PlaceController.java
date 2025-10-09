@@ -99,4 +99,11 @@ public class PlaceController {
         int count = favoriteService.getFavoriteCount(placeId);
         return ResponseEntity.ok(new ResponseDTO<>(false, count));
     }
+
+    @GetMapping("/my-places")
+    public ResponseEntity<ResponseDTO<List<ItemPlaceDTO>>> getMyPlaces(Principal principal) throws Exception {
+        String hostEmail = principal.getName();
+        List<ItemPlaceDTO> myPlaces = placeService.getPlacesUser(hostEmail);
+        return ResponseEntity.ok(new ResponseDTO<>(false, myPlaces));
+    }
 }

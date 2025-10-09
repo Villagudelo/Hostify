@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -62,6 +61,48 @@ public class UserController {
         userService.updatePhoto(id, photoUrl);
 
         return ResponseEntity.ok(new ResponseDTO<>(false, "Foto de perfil actualizada"));
+    }
+
+    // Endpoint para subir documento legal del anfitrión
+    @PostMapping("/{id}/legal-document")
+    public ResponseEntity<ResponseDTO<String>> uploadLegalDocument(
+            @PathVariable String id,
+            @RequestParam("file") MultipartFile file) throws Exception {
+
+        String documentUrl = fileStorageService.storeFile(file, id + "_legal");
+        
+        User user = userRepository.findById(id).orElseThrow();
+        EditUserDTO editDTO = new EditUserDTO(
+            user.getName(),
+            user.getPhone(), 
+            user.getPhotoUrl(),
+            user.getDateBirth(),
+            user.getDescription(),
+            documentUrl  // Actualiza el documento legal
+        );
+        
+        userService.edit(id, editDTO);
+
+        return ResponseEntity.ok(new ResponseDTO<>(false, "Documento legal subido correctamente"));
+    }
+
+    // Endpoint para eliminar documento legal del anfitrión
+    @DeleteMapping("/{id}/legal-document")
+    public ResponseEntity<ResponseDTO<String>> deleteLegalDocument(@PathVariable String id) throws Exception {
+        
+        User user = userRepository.findById(id).orElseThrow();
+        EditUserDTO editDTO = new EditUserDTO(
+            user.getName(),
+            user.getPhone(), 
+            user.getPhotoUrl(),
+            user.getDateBirth(),
+            user.getDescription(),
+            null  // Elimina el documento legal
+        );
+        
+        userService.edit(id, editDTO);
+
+        return ResponseEntity.ok(new ResponseDTO<>(false, "Documento legal eliminado"));
     }
 
     //Temporal para prueba
