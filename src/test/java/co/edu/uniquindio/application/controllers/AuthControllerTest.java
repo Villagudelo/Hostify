@@ -39,10 +39,10 @@ public class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        String uniqueEmail = "test" + System.currentTimeMillis() + "@example.com";
+        String uniqueEmail = "valentina09s@gmail.com";
 
         validUserDTO = new CreateUserDTO(
-            "Usuario Prueba",
+            "Valentina Salazar",
             "3001234567",
             uniqueEmail,
             "Password123*",
@@ -90,7 +90,7 @@ public class AuthControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidLoginDTO)))
-                .andExpect(status().isNotFound()) // ✅ CAMBIADO: Tu UserService lanza NotFoundException
+                .andExpect(status().isNotFound()) //  CAMBIADO: Tu UserService lanza NotFoundException
                 .andExpect(jsonPath("$.error").value(true));
     }
 

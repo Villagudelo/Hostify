@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public TokenDTO login(LoginDTO loginDTO) throws Exception {
+    public UserDTO login(LoginDTO loginDTO) throws Exception {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         // Recuperar el usuario desde la base de datos
@@ -147,11 +147,11 @@ public class UserServiceImpl implements UserService {
 
         // Verificar si la contraseña es correcta usando el PasswordEncoder
         if(!passwordEncoder.matches(loginDTO.password(), user.getPassword())){
-            // ✅ ARREGLAR: Cambiar mensaje de error más específico
             throw new NotFoundException("Credenciales inválidas");
         }
 
-        return new TokenDTO("OK");
+        // Retornar el UserDTO con los datos del usuario autenticado
+        return userMapper.toUserDTO(user);
     }
 
     @Override

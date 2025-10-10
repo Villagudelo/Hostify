@@ -5,7 +5,7 @@ import co.edu.uniquindio.application.dto.user.*;
 
 public interface UserService {
 
-    TokenDTO login(LoginDTO loginDTO) throws Exception;
+    UserDTO login(LoginDTO loginDTO) throws Exception;
 
     void create(CreateUserDTO userDTO) throws Exception;
 
