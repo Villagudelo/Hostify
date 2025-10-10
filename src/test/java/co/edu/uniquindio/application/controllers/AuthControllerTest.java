@@ -77,7 +77,7 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.error").value(false))
                 .andExpect(jsonPath("$.content").exists())
                 .andExpect(jsonPath("$.content.token").exists())
-                .andExpect(jsonPath("$.content.token").value("OK"));
+                .andExpect(jsonPath("$.content.token").isNotEmpty());
     }
 
     @Test
@@ -138,7 +138,7 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.error").value(true));
     }
 
-    // ✅ TEST ADICIONAL: Password débil
+    // TEST ADICIONAL: Password débil
     @Test
     void registerUserWithWeakPasswordTest() throws Exception {
         CreateUserDTO weakPasswordDTO = new CreateUserDTO(
