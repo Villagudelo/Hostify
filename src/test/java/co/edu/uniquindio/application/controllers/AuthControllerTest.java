@@ -12,14 +12,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:app-test.properties")
+@Transactional
 public class AuthControllerTest {
 
     @Autowired
@@ -36,7 +39,6 @@ public class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Configurar datos de prueba con un email único usando timestamp
         String uniqueEmail = "test" + System.currentTimeMillis() + "@example.com";
 
         validUserDTO = new CreateUserDTO(
@@ -66,16 +68,16 @@ public class AuthControllerTest {
 
     @Test
     void loginSuccessfulTest() throws Exception {
-        // Primero registramos un usuario usando el servicio directamente
         userService.create(validUserDTO);
 
-        // Intentamos hacer login
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validLoginDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.error").value(false))
-                .andExpect(jsonPath("$.content").exists());
+                .andExpect(jsonPath("$.content").exists())
+                .andExpect(jsonPath("$.content.token").exists())
+                .andExpect(jsonPath("$.content.token").value("OK"));
     }
 
     @Test
@@ -88,7 +90,7 @@ public class AuthControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidLoginDTO)))
-                .andExpect(status().is4xxClientError())
+                .andExpect(status().isNotFound()) // ✅ CAMBIADO: Tu UserService lanza NotFoundException
                 .andExpect(jsonPath("$.error").value(true));
     }
 
@@ -106,12 +108,15 @@ public class AuthControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidUserDTO)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest()) // ValidationException → 400
+                .andExpect(jsonPath("$.error").value(true));
     }
 
     @Test
     void forgotPasswordTest() throws Exception {
-        ForgotPasswordDTO forgotPasswordDTO = new ForgotPasswordDTO("test@example.com");
+        userService.create(validUserDTO);
+        
+        ForgotPasswordDTO forgotPasswordDTO = new ForgotPasswordDTO(validUserDTO.email());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/forgot-password")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -119,5 +124,36 @@ public class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.error").value(false))
                 .andExpect(jsonPath("$.content").value("Código enviado"));
+    }
+
+    @Test
+    void registerUserWithDuplicateEmailTest() throws Exception {
+        userService.create(validUserDTO);
+        
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(validUserDTO)))
+                .andDo(print()) // Para debug si falla
+                .andExpect(status().isConflict()) // ✅ ValueConflictException → 409
+                .andExpect(jsonPath("$.error").value(true));
+    }
+
+    // ✅ TEST ADICIONAL: Password débil
+    @Test
+    void registerUserWithWeakPasswordTest() throws Exception {
+        CreateUserDTO weakPasswordDTO = new CreateUserDTO(
+            "Usuario Prueba",
+            "3001234567",
+            "weak" + System.currentTimeMillis() + "@example.com",
+            "123", // Password débil
+            null,
+            LocalDate.of(2000, 1, 1)
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(weakPasswordDTO)))
+                .andExpect(status().isBadRequest()) // ValidationException → 400
+                .andExpect(jsonPath("$.error").value(true));
     }
 }

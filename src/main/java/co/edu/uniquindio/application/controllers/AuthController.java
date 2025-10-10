@@ -30,7 +30,7 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public ResponseEntity<ResponseDTO<String>> sendVerificationCode(@RequestBody ForgotPasswordDTO forgotPasswordDTO) throws Exception{
-        //TODO llamar al servicio para enviar el código
+        userService.sendPasswordResetCode(forgotPasswordDTO);
         return ResponseEntity.ok(new ResponseDTO<>(false, "Código enviado"));
     }
 

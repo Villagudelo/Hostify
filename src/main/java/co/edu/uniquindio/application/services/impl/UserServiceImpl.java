@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -27,7 +26,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void create(CreateUserDTO userDTO) throws Exception {
-
         //Validacion del formato correcto del email
         if (!emailValidation(userDTO.email())) {
             throw new ValidationException("El formato del email no es válido");
@@ -96,7 +94,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changePassword(String id, ChangePasswordDTO changePasswordDTO) throws Exception {
-
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         // Recuperar el usuario desde la base de datos
@@ -117,7 +114,6 @@ public class UserServiceImpl implements UserService {
 
         // Guardar el usuario con la nueva contraseña
         userRepository.save(user);
-
     }
 
     @Transactional
@@ -125,7 +121,7 @@ public class UserServiceImpl implements UserService {
     public void resetPassword(ResetPasswordDTO resetPasswordDTO) throws Exception {
         // Validación de nueva contraseña segura
         if (!securePassword(resetPasswordDTO.newPassword())) {
-            throw new ValidationException("La nueva contrast debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número");
+            throw new ValidationException("La nueva contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número");
         }
 
         passwordResetService.validateCodeAndResetPassword(
@@ -144,7 +140,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public TokenDTO login(LoginDTO loginDTO) throws Exception {
-
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         // Recuperar el usuario desde la base de datos
@@ -152,10 +147,20 @@ public class UserServiceImpl implements UserService {
 
         // Verificar si la contraseña es correcta usando el PasswordEncoder
         if(!passwordEncoder.matches(loginDTO.password(), user.getPassword())){
-            throw new NotFoundException("El usuario no existe");
+            // ✅ ARREGLAR: Cambiar mensaje de error más específico
+            throw new NotFoundException("Credenciales inválidas");
         }
 
         return new TokenDTO("OK");
+    }
+
+    @Override
+    public void sendPasswordResetCode(ForgotPasswordDTO forgotPasswordDTO) throws Exception {
+        // Verificar que el usuario exista
+        getUserByEmail(forgotPasswordDTO.email());
+        
+        // Delegar al PasswordResetService
+        passwordResetService.generateAndSendResetCode(forgotPasswordDTO.email());
     }
 
     private User getUserById(String id) throws Exception{
@@ -179,6 +184,4 @@ public class UserServiceImpl implements UserService {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         return email != null && email.matches(emailRegex);
     }
-
-
 }
