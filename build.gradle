@@ -53,6 +53,12 @@ dependencies {
     // Si usas Spring Boot 3.x, también necesitas:
     implementation "jakarta.mail:jakarta.mail-api:2.1.1"
 
+    // ✅ AGREGAR ESTA DEPENDENCIA:
+    testImplementation 'org.springframework.security:spring-security-test'
+    
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
     // Spring Security (para PasswordEncoder)
     implementation 'org.springframework.boot:spring-boot-starter-security'
 

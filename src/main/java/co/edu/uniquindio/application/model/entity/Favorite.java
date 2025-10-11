@@ -15,8 +15,10 @@ public class Favorite {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "user_id") 
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "place_id") 
     private Place place;
 }
