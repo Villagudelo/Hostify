@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Solo valida el token, no el rol
             if (jwtUtil.validateToken(token)) {
                 String email = jwtUtil.getEmailFromToken(token);
-                Long userId = jwtUtil.getUserIdFromToken(token);
+                String userId = jwtUtil.getUserIdFromToken(token);
 
                 System.out.println("Email from Token: " + email); // Debugging line
                 System.out.println("UserId from Token: " + userId); // Debugging line
