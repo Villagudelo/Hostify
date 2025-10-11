@@ -58,10 +58,10 @@ dependencies {
 
     // Validación (si no la tienes)
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 
 tasks.named('test') {
     useJUnitPlatform()
 }
-

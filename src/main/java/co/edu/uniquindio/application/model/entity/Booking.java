@@ -3,6 +3,7 @@ package co.edu.uniquindio.application.model.entity;
 import co.edu.uniquindio.application.model.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor

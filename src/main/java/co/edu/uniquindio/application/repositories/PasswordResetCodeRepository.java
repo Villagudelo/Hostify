@@ -17,6 +17,8 @@ public interface PasswordResetCodeRepository extends JpaRepository<PasswordReset
 
     Optional<PasswordResetCode> findTopByEmailAndUsedFalseOrderByCreatedAtDesc(String email);
 
+    Optional<PasswordResetCode> findFirstByEmailAndUsedFalseOrderByCreatedAtDesc(String email);
+
     @Modifying
     @Query("UPDATE PasswordResetCode p SET p.used = true WHERE p.email = :email AND p.used = false")
     void invalidatePreviousCodes(@Param("email") String email);
@@ -24,4 +26,6 @@ public interface PasswordResetCodeRepository extends JpaRepository<PasswordReset
     @Modifying
     @Query("DELETE FROM PasswordResetCode p WHERE p.expiresAt < :now")
     void deleteExpiredCodes(@Param("now") LocalDateTime now);
+
+    void deleteByExpiresAtBefore(LocalDateTime now);
 }

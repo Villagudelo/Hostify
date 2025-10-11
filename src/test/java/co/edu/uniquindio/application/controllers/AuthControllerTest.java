@@ -1,6 +1,7 @@
 package co.edu.uniquindio.application.controllers;
 
 import co.edu.uniquindio.application.dto.user.*;
+import co.edu.uniquindio.application.repositories.PasswordResetCodeRepository;
 import co.edu.uniquindio.application.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,9 @@ public class AuthControllerTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PasswordResetCodeRepository passwordResetCodeRepository;
 
     private CreateUserDTO validUserDTO;
     private LoginDTO validLoginDTO;
@@ -154,6 +158,80 @@ public class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(weakPasswordDTO)))
                 .andExpect(status().isBadRequest()) // ValidationException → 400
+                .andExpect(jsonPath("$.error").value(true));
+    }
+
+    @Test
+    void resetPasswordTest() throws Exception {
+        userService.create(validUserDTO);
+
+        // Primero solicita el código
+        ForgotPasswordDTO forgotPasswordDTO = new ForgotPasswordDTO(validUserDTO.email());
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/forgot-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(forgotPasswordDTO)));
+
+        // Obtiene el código real generado de la base de datos
+        String realCode = passwordResetCodeRepository
+                .findTopByEmailAndUsedFalseOrderByCreatedAtDesc(validUserDTO.email())
+                .orElseThrow()
+                .getCode();
+
+        // Luego intenta cambiar la contraseña usando el código real
+        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
+            validUserDTO.email(),
+            realCode,
+            "NewPassword123*"
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/auth/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(resetPasswordDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.error").value(false))
+                .andExpect(jsonPath("$.content").value("Contraseña cambiada"));
+    }
+
+    @Test
+    void resetPasswordWithInvalidCodeTest() throws Exception {
+        userService.create(validUserDTO);
+
+        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
+            validUserDTO.email(),
+            "000000", // Código inválido
+            "NewPassword123*"
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/auth/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(resetPasswordDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value(true));
+    }
+
+    @Test
+    void resetPasswordWithExpiredCodeTest() throws Exception {
+        userService.create(validUserDTO);
+
+        // Primero solicita el código
+        ForgotPasswordDTO forgotPasswordDTO = new ForgotPasswordDTO(validUserDTO.email());
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/forgot-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(forgotPasswordDTO)));
+
+        // Simula que han pasado más de 15 minutos
+        Thread.sleep(1000); // Solo para simular el paso del tiempo
+
+        ResetPasswordDTO resetPasswordDTO = new ResetPasswordDTO(
+            validUserDTO.email(),
+            "123456",
+            "NewPassword123*"
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/auth/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(resetPasswordDTO)))
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value(true));
     }
 }
