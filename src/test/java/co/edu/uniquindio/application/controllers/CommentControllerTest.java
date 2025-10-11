@@ -96,7 +96,7 @@ public class CommentControllerTest {
             userService.create(guestUserDTO);
             userService.create(hostUserDTO);
 
-            // ✅ CREAR PLACE CON TODOS LOS CAMPOS REQUERIDOS
+            // CREAR PLACE CON TODOS LOS CAMPOS REQUERIDOS
             CreatePlaceDTO placeDTO = new CreatePlaceDTO(
                     "Test Place for Comments",       // title
                     "Description for test place",    // description  
@@ -111,14 +111,14 @@ public class CommentControllerTest {
                     "Km 5"               
             );
 
-            // ✅ CAPTURAR Y ASIGNAR EL ID DEL PLACE
+            // CAPTURAR Y ASIGNAR EL ID DEL PLACE
             Long placeId = placeService.create(placeDTO, hostEmail);
             testPlaceId = placeId;
 
-            System.out.println("✅ Test Place ID asignado: " + testPlaceId);
+            System.out.println("Test Place ID asignado: " + testPlaceId);
 
         } catch (Exception e) {
-            System.out.println("❌ Error en setup: " + e.getMessage());
+            System.out.println("Error en setup: " + e.getMessage());
             e.printStackTrace();
             throw e; // Re-lanzar para que falle el test
         }
@@ -244,7 +244,7 @@ public class CommentControllerTest {
 
     @Test
     void createCommentSuccessfulTest() throws Exception {
-        // ✅ CREAR RESERVA Y COMENTARIO REAL
+        // CREAR RESERVA Y COMENTARIO REAL
         Long commentId = crearComentarioDePrueba();
         
         // Verificar que se creó correctamente
@@ -271,7 +271,7 @@ public class CommentControllerTest {
 
     @Test
     void replyToCommentAsNonHostTest() throws Exception {
-        // ✅ CREAR COMENTARIO REAL
+        // CREAR COMENTARIO REAL
         Long existingCommentId = crearComentarioDePrueba();
 
         String replyJson = """
@@ -312,7 +312,7 @@ public class CommentControllerTest {
 
     @Test
     void replyToCommentSuccessfulTest() throws Exception {
-        // ✅ CREAR COMENTARIO REAL
+        // CREAR COMENTARIO REAL
         Long existingCommentId = crearComentarioDePrueba();
 
         String replyJson = """
@@ -342,7 +342,7 @@ public class CommentControllerTest {
 
     @Test
     void getCommentsByPlaceSuccessfulTest() throws Exception {
-        // ✅ CREAR COMENTARIO REAL
+        // CREAR COMENTARIO REAL
         crearComentarioDePrueba();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/place/{placeId}", testPlaceId)
@@ -368,7 +368,7 @@ public class CommentControllerTest {
 
     @Test
     void getCommentsByPlaceWithCommentsTest() throws Exception {
-        // ✅ CREAR COMENTARIO REAL
+        // CREAR COMENTARIO REAL
         Long commentId1 = crearComentarioDePrueba();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/place/{placeId}", testPlaceId)
@@ -394,7 +394,7 @@ public class CommentControllerTest {
 
     @Test
     void getAverageRatingSuccessfulTest() throws Exception {
-        // ✅ CREAR COMENTARIOS REALES CON DIFERENTES RATINGS
+        // CREAR COMENTARIOS REALES CON DIFERENTES RATINGS
         crearComentarioConRating(5);
         crearComentarioConRating(3);
         crearComentarioConRating(4);
@@ -421,7 +421,7 @@ public class CommentControllerTest {
 
     @Test
     void getAverageRatingForPlaceWithNoCommentsTest() throws Exception {
-        // ✅ CREAR NUEVO PLACE
+        // CREAR NUEVO PLACE
         CreatePlaceDTO newPlaceDTO = new CreatePlaceDTO(
                 "Place Sin Comentarios",
                 "Descripción lugar sin comentarios",
@@ -449,7 +449,7 @@ public class CommentControllerTest {
     // ========================== MÉTODOS AUXILIARES ==========================
 
     /**
-     * ✅ MÉTODO AUXILIAR REAL PARA CREAR COMENTARIO DE PRUEBA
+     * MÉTODO AUXILIAR REAL PARA CREAR COMENTARIO DE PRUEBA
      */
     private Long crearComentarioDePrueba() throws Exception {
         if (testPlaceId == null) {
@@ -458,7 +458,7 @@ public class CommentControllerTest {
 
         System.out.println("🔧 Creando reserva para place ID: " + testPlaceId);
 
-        // ✅ CREAR RESERVA REAL
+        // CREAR RESERVA REAL
         CreateBookingDTO bookingDTO = new CreateBookingDTO(
             LocalDate.now().plusDays(1),
             LocalDate.now().plusDays(3),
@@ -467,16 +467,16 @@ public class CommentControllerTest {
         );
         
         Long bookingId = bookingService.create(bookingDTO, guestEmail);
-        System.out.println("✅ Reserva creada con ID: " + bookingId);
+        System.out.println("Reserva creada con ID: " + bookingId);
         
-        // ✅ FLUJO CORRECTO: PENDING → CONFIRMED → COMPLETED
+        // FLUJO CORRECTO: PENDING → CONFIRMED → COMPLETED
         bookingService.updateStatus(bookingId, BookingStatus.CONFIRMED, hostEmail);
-        System.out.println("✅ Reserva marcada como CONFIRMED");
+        System.out.println("Reserva marcada como CONFIRMED");
         
         bookingService.updateStatus(bookingId, BookingStatus.COMPLETED, hostEmail);
-        System.out.println("✅ Reserva marcada como COMPLETED");
+        System.out.println("Reserva marcada como COMPLETED");
         
-        // ✅ CREAR COMENTARIO REAL
+        // CREAR COMENTARIO REAL
         CreateCommentDTO commentDTO = new CreateCommentDTO(
             bookingId,
             5,
@@ -484,13 +484,13 @@ public class CommentControllerTest {
         );
         
         CommentDTO createdComment = commentService.createComment(commentDTO, guestEmail);
-        System.out.println("✅ Comentario creado con ID: " + createdComment.id());
+        System.out.println("Comentario creado con ID: " + createdComment.id());
         
         return createdComment.id();
     }
 
     /**
-     * ✅ CREAR COMENTARIO CON RATING ESPECÍFICO
+     * CREAR COMENTARIO CON RATING ESPECÍFICO
      */
     private Long crearComentarioConRating(int rating) throws Exception {
         if (testPlaceId == null) {
@@ -506,7 +506,7 @@ public class CommentControllerTest {
         
         Long bookingId = bookingService.create(bookingDTO, guestEmail);
         
-        // ✅ FLUJO CORRECTO: PENDING → CONFIRMED → COMPLETED
+        // FLUJO CORRECTO: PENDING → CONFIRMED → COMPLETED
         bookingService.updateStatus(bookingId, BookingStatus.CONFIRMED, hostEmail);
         bookingService.updateStatus(bookingId, BookingStatus.COMPLETED, hostEmail);
         

@@ -84,7 +84,7 @@ public class UserControllerTest {
         }
     }
 
-    // 1️⃣ TEST ESENCIAL: Obtener usuario exitosamente
+    // TEST ESENCIAL: Obtener usuario exitosamente
     @Test
     void getUserSuccessfulTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/users/{id}", userId)
@@ -94,7 +94,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.content.id").value(userId));
     }
 
-    // 2️⃣ TEST ESENCIAL: Usuario no encontrado
+    // TEST ESENCIAL: Usuario no encontrado
     @Test
     void getUserNotFoundTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/users/{id}", "nonexistent-id")
@@ -103,7 +103,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(true));
     }
 
-    // 3️⃣ TEST ESENCIAL: Editar usuario exitosamente
+    //TEST ESENCIAL: Editar usuario exitosamente
     @Test
     void editUserSuccessfulTest() throws Exception {
         EditUserDTO editDTO = new EditUserDTO(
@@ -123,7 +123,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(false));
     }
 
-    // 4️⃣ TEST ESENCIAL: Eliminar usuario exitosamente
+    //TEST ESENCIAL: Eliminar usuario exitosamente
     @Test
     void deleteUserSuccessfulTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/users/{id}", userId)
@@ -132,7 +132,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(false));
     }
 
-    // 5️⃣ TEST ESENCIAL: Cambiar contraseña exitosamente
+    //TEST ESENCIAL: Cambiar contraseña exitosamente
     @Test
     void changePasswordSuccessfulTest() throws Exception {
         ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO(
@@ -148,7 +148,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(false));
     }
 
-    // 6️⃣ TEST ESENCIAL: Cambiar contraseña con contraseña incorrecta
+    //TEST ESENCIAL: Cambiar contraseña con contraseña incorrecta
     @Test
     void changePasswordWithWrongPasswordTest() throws Exception {
         ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO(
@@ -164,7 +164,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(true));
     }
 
-    // 7️⃣ TEST ESENCIAL: Subir foto exitosamente
+    //TEST ESENCIAL: Subir foto exitosamente
     @Test
     void uploadPhotoSuccessfulTest() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
@@ -181,7 +181,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(false));
     }
 
-    // 8️⃣ TEST ESENCIAL: Solicitar reset de contraseña
+    //TEST ESENCIAL: Solicitar reset de contraseña
     @Test
     void requestPasswordResetTest() throws Exception {
         PasswordResetRequestDTO requestDTO = new PasswordResetRequestDTO(userEmail);
@@ -194,7 +194,7 @@ public class UserControllerTest {
     }
 
 
-    // 1️⃣1️⃣ TEST ADICIONAL: Eliminar documento legal
+    //TEST ADICIONAL: Eliminar documento legal
     @Test
     void deleteLegalDocumentSuccessfulTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/users/{id}/legal-document", userId)
@@ -204,7 +204,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.content").value("Documento legal eliminado"));
     }
 
-    // 1️⃣2️⃣ TEST ADICIONAL: Obtener todos los usuarios
+    //TEST ADICIONAL: Obtener todos los usuarios
     @Test
     void getAllUsersSuccessfulTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/users/all")
@@ -214,7 +214,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.content").isArray());
     }
 
-    // 1️⃣3️⃣ TEST ADICIONAL: Editar usuario con datos inválidos
+    //TEST ADICIONAL: Editar usuario con datos inválidos
     @Test
     void editUserWithInvalidDataTest() throws Exception {
         EditUserDTO invalidEditDTO = new EditUserDTO(
@@ -234,7 +234,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(true));
     }
 
-    // 1️⃣4️⃣ TEST ADICIONAL: Cambiar contraseña con nueva contraseña débil
+    //TEST ADICIONAL: Cambiar contraseña con nueva contraseña débil
     @Test
     void changePasswordWithWeakPasswordTest() throws Exception {
         ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO(
@@ -246,11 +246,11 @@ public class UserControllerTest {
                 .header("Authorization", "Bearer " + userToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(changePasswordDTO)))
-                .andExpect(status().isOk()) // ✅ Cambiar de isBadRequest() a isOk()
-                .andExpect(jsonPath("$.error").value(false)); // ✅ Tu app acepta contraseñas débiles
+                .andExpect(status().isOk()) //Cambiar de isBadRequest() a isOk()
+                .andExpect(jsonPath("$.error").value(false)); //Tu app acepta contraseñas débiles
     }
 
-    // 1️⃣5️⃣ TEST ADICIONAL: Subir archivo con formato inválido
+    //TEST ADICIONAL: Subir archivo con formato inválido
     @Test
     void uploadPhotoWithInvalidFormatTest() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
@@ -267,7 +267,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(true));
     }
 
-    // 1️⃣6️⃣ TEST ADICIONAL: Acceso sin autenticación
+    //TEST ADICIONAL: Acceso sin autenticación
     @Test
     void getUserWithoutAuthenticationTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/users/{id}", userId))
@@ -275,7 +275,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(false));
     }
 
-    // 1️⃣7️⃣ TEST ADICIONAL: Acceso con token inválido
+    //TEST ADICIONAL: Acceso con token inválido
     @Test
     void getUserWithInvalidTokenTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/users/{id}", userId)
@@ -284,7 +284,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(false));
     }
 
-    // 1️⃣8️⃣ TEST ADICIONAL: Eliminar usuario inexistente
+    //TEST ADICIONAL: Eliminar usuario inexistente
     @Test
     void deleteNonExistentUserTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/users/{id}", "nonexistent-id")
@@ -293,7 +293,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(true));
     }
 
-    // 1️⃣9️⃣ TEST ADICIONAL: Solicitar reset con email inexistente
+    //TEST ADICIONAL: Solicitar reset con email inexistente
     @Test
     void requestPasswordResetWithInvalidEmailTest() throws Exception {
         PasswordResetRequestDTO requestDTO = new PasswordResetRequestDTO("nonexistent@example.com");
@@ -305,7 +305,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.error").value(true));
     }
 
-    // 2️⃣0️⃣ TEST ADICIONAL: Confirmar reset con código inválido
+    //TEST ADICIONAL: Confirmar reset con código inválido
     @Test
     void confirmPasswordResetWithInvalidCodeTest() throws Exception {
         ResetPasswordDTO resetDTO = new ResetPasswordDTO(

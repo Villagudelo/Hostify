@@ -66,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
         Booking savedBooking = bookingRepository.save(booking);
         emailService.sendBookingConfirmation(guest.getEmail(), booking);
         
-        return savedBooking.getId(); // ✅ RETORNAR ID
+        return savedBooking.getId(); // RETORNAR ID
     }
 
     @Override

@@ -237,7 +237,7 @@ public class PlaceControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/places/detail/{placeId}", nonExistentId)
                 .header("Authorization", "Bearer " + hostToken))
                 .andDo(print())
-                .andExpect(status().isNotFound()) // ✅ CORREGIDO: 404 en lugar de 400
+                .andExpect(status().isNotFound()) // CORREGIDO: 404
                 .andExpect(jsonPath("$.error").value(true))
                 .andExpect(jsonPath("$.content").value("Alojamiento no encontrado"));
     }
@@ -313,7 +313,7 @@ public class PlaceControllerTest {
         String prefix = "Cart";
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/places/autocomplete-city")
-                .header("Authorization", "Bearer " + hostToken) // ✅ AGREGADO: Autenticación requerida
+                .header("Authorization", "Bearer " + hostToken) //AGREGADO: Autenticación requerida
                 .param("prefix", prefix))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -326,7 +326,7 @@ public class PlaceControllerTest {
         String emptyPrefix = "";
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/places/autocomplete-city")
-                .header("Authorization", "Bearer " + hostToken) // ✅ AGREGADO: Autenticación requerida
+                .header("Authorization", "Bearer " + hostToken) //AGREGADO: Autenticación requerida
                 .param("prefix", emptyPrefix))
                 .andDo(print())
                 .andExpect(status().isOk())

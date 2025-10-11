@@ -78,7 +78,7 @@ public class BookingControllerTest {
 
     @Test
     void createBookingWithNonExistentPlaceTest() throws Exception {
-        // ✅ ESTE YA FUNCIONA PERFECTO
+        // ESTE YA FUNCIONA PERFECTO
         mockMvc.perform(MockMvcRequestBuilders.post("/api/bookings/create")
                 .header("Authorization", "Bearer " + guestToken)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -91,7 +91,7 @@ public class BookingControllerTest {
 
     @Test
     void createBookingWithPastCheckInTest() throws Exception {
-        // ✅ CORREGIDO: Tu service verifica place ANTES que fechas
+        // CORREGIDO: Tu service verifica place ANTES que fechas
         mockMvc.perform(MockMvcRequestBuilders.post("/api/bookings/create")
                 .header("Authorization", "Bearer " + guestToken)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -111,7 +111,7 @@ public class BookingControllerTest {
             2
         );
 
-        // ✅ CORREGIDO: Tu service verifica place ANTES que fechas
+        // Verifica place ANTES que fechas
         mockMvc.perform(MockMvcRequestBuilders.post("/api/bookings/create")
                 .header("Authorization", "Bearer " + guestToken)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +124,7 @@ public class BookingControllerTest {
 
     @Test
     void getUserBookingsSuccessfulTest() throws Exception {
-        // ✅ ESTE YA FUNCIONA PERFECTO
+
         mockMvc.perform(MockMvcRequestBuilders.get("/api/bookings/history")
                 .header("Authorization", "Bearer " + guestToken))
                 .andDo(print())
@@ -135,7 +135,7 @@ public class BookingControllerTest {
 
     @Test
     void getUserBookingsWithStatusTest() throws Exception {
-        // ✅ ESTE YA FUNCIONA PERFECTO
+
         mockMvc.perform(MockMvcRequestBuilders.get("/api/bookings/history")
                 .header("Authorization", "Bearer " + guestToken)
                 .param("status", "PENDING")
@@ -149,7 +149,7 @@ public class BookingControllerTest {
 
     @Test
     void cancelBookingWithNonExistentIdTest() throws Exception {
-        // ✅ ESTE YA FUNCIONA PERFECTO
+
         Long nonExistentId = 99999L;
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/api/bookings/cancel/{bookingId}", nonExistentId)
@@ -162,7 +162,7 @@ public class BookingControllerTest {
 
     @Test
     void createBookingWithoutAuthenticationTest() throws Exception {
-        // ✅ ESTE YA FUNCIONA PERFECTO
+
         mockMvc.perform(MockMvcRequestBuilders.post("/api/bookings/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validBookingDTO)))
@@ -172,7 +172,7 @@ public class BookingControllerTest {
 
     @Test
     void createBookingWithInvalidTokenTest() throws Exception {
-        // ✅ ESTE YA FUNCIONA PERFECTO
+
         mockMvc.perform(MockMvcRequestBuilders.post("/api/bookings/create")
                 .header("Authorization", "Bearer invalid-jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -192,7 +192,7 @@ public class BookingControllerTest {
             }
             """;
 
-        // ✅ CORREGIDO: Tu service lanza 500 con placeId null, es normal
+        // Lanza 500 con placeId null, es normal
         mockMvc.perform(MockMvcRequestBuilders.post("/api/bookings/create")
                 .header("Authorization", "Bearer " + guestToken)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -212,7 +212,7 @@ public class BookingControllerTest {
             0 // guestCount = 0
         );
 
-        // ✅ ESTE YA FUNCIONA (place no existe, da "Alojamiento no encontrado")
+        // Place no existe, da "Alojamiento no encontrado")
         mockMvc.perform(MockMvcRequestBuilders.post("/api/bookings/create")
                 .header("Authorization", "Bearer " + guestToken)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -232,7 +232,7 @@ public class BookingControllerTest {
             -1 // guestCount negativo
         );
 
-        // ✅ ESTE YA FUNCIONA (place no existe, da "Alojamiento no encontrado")
+        // Place no existe, da "Alojamiento no encontrado")
         mockMvc.perform(MockMvcRequestBuilders.post("/api/bookings/create")
                 .header("Authorization", "Bearer " + guestToken)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -253,7 +253,7 @@ public class BookingControllerTest {
             2
         );
 
-        // ✅ ESTE YA FUNCIONA (place no existe, da "Alojamiento no encontrado")
+        // Place no existe, da "Alojamiento no encontrado")
         mockMvc.perform(MockMvcRequestBuilders.post("/api/bookings/create")
                 .header("Authorization", "Bearer " + guestToken)
                 .contentType(MediaType.APPLICATION_JSON)

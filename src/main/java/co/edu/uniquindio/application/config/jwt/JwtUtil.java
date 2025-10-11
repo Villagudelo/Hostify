@@ -60,7 +60,7 @@ public class JwtUtil {
         return claims.getSubject();
     }
 
-    public String getUserIdFromToken(String token) { // ✅ CAMBIO: Long → String
+    public String getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
@@ -68,12 +68,7 @@ public class JwtUtil {
                 .getPayload();
         Object o = claims.get("userId");
         if (o == null) return null;
-        // ✅ CAMBIO: Devolver como String directamente
+        // Devolver como String directamente
         return o.toString();
-        
-        // ❌ CÓDIGO ANTERIOR:
-        // if (o instanceof Integer) return ((Integer) o).longValue();
-        // if (o instanceof Long) return (Long) o;
-        // return Long.parseLong(o.toString());
     }
 }

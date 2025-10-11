@@ -72,7 +72,7 @@ public class PlaceServiceImpl implements PlaceService {
         place.setAddress(placeDTO.address());
         
         
-        // ✅ GUARDAR Y RETORNAR EL ID
+        // GUARDAR Y RETORNAR EL ID
         Place savedPlace = placeRepository.save(place);
         return savedPlace.getId();
     }

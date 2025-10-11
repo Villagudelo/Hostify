@@ -138,7 +138,7 @@ public class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validUserDTO)))
                 .andDo(print()) // Para debug si falla
-                .andExpect(status().isConflict()) // ✅ ValueConflictException → 409
+                .andExpect(status().isConflict()) // ValueConflictException → 409
                 .andExpect(jsonPath("$.error").value(true));
     }
 
