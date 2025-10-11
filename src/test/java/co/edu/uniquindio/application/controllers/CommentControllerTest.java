@@ -4,6 +4,7 @@ import co.edu.uniquindio.application.config.jwt.JwtUtil;
 import co.edu.uniquindio.application.dto.Comment.CommentDTO;
 import co.edu.uniquindio.application.dto.Comment.CreateCommentDTO;
 import co.edu.uniquindio.application.dto.Comment.ReplyCommentDTO;
+import co.edu.uniquindio.application.dto.booking.CreateBookingDTO;
 import co.edu.uniquindio.application.dto.place.CreatePlaceDTO;
 import co.edu.uniquindio.application.dto.user.CreateUserDTO;
 import co.edu.uniquindio.application.model.enums.BookingStatus;
@@ -25,7 +26,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -65,7 +65,6 @@ public class CommentControllerTest {
     private String guestToken;
     private String hostToken;
     private Long testPlaceId;
-    private Long testBookingId;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -97,33 +96,31 @@ public class CommentControllerTest {
             userService.create(guestUserDTO);
             userService.create(hostUserDTO);
 
-            // Crear un place de prueba
+            // ✅ CREAR PLACE CON TODOS LOS CAMPOS REQUERIDOS
             CreatePlaceDTO placeDTO = new CreatePlaceDTO(
-                    "Test Place for Comments",
-                    "Description for test place",
-                    4,
-                    100000.0f,
-                    List.of("https://example.com/image1.jpg"),
-                    null,
-                    List.of(Service.WIFI),
-                    4.7110,
-                    -74.0721
+                    "Test Place for Comments",       // title
+                    "Description for test place",    // description  
+                    4,                              // maxGuests
+                    100000.0f,                      // nightlyPrice
+                    List.of("https://example.com/image1.jpg"), // imageUrls
+                    null,                           // imageFiles
+                    List.of(Service.WIFI),          // services
+                    4.7110,                         // latitude
+                    -74.0721,  
+                    "Bogota",
+                    "Km 5"               
             );
 
-            placeService.create(placeDTO, hostEmail);
+            // ✅ CAPTURAR Y ASIGNAR EL ID DEL PLACE
+            Long placeId = placeService.create(placeDTO, hostEmail);
+            testPlaceId = placeId;
 
-            // Obtener el ID del place creado (asumiendo que es el primero)
-            var places = placeService.getPlacesUser(hostEmail);
-            if (!places.isEmpty()) {
-                testPlaceId = places.get(0).id();
-            }
-
-            // Crear una reserva de prueba COMPLETED para poder comentar
-            // Esto depende de tu implementación de BookingService
-            // testBookingId = crearReservaDePrueba();
+            System.out.println("✅ Test Place ID asignado: " + testPlaceId);
 
         } catch (Exception e) {
-            System.out.println("Error en setup: " + e.getMessage());
+            System.out.println("❌ Error en setup: " + e.getMessage());
+            e.printStackTrace();
+            throw e; // Re-lanzar para que falle el test
         }
 
         guestToken = jwtUtil.generateToken("1", guestEmail);
@@ -137,8 +134,8 @@ public class CommentControllerTest {
         String commentJson = """
             {
                 "bookingId": 1,
-                "text": "Comentario sin autenticación",
-                "rating": 4
+                "rating": 4,
+                "text": "Comentario sin autenticación"
             }
             """;
 
@@ -154,8 +151,8 @@ public class CommentControllerTest {
         String emptyTextJson = """
             {
                 "bookingId": 1,
-                "text": "",
-                "rating": 5
+                "rating": 5,
+                "text": ""
             }
             """;
 
@@ -173,8 +170,8 @@ public class CommentControllerTest {
         String nullTextJson = """
             {
                 "bookingId": 1,
-                "text": null,
-                "rating": 5
+                "rating": 5,
+                "text": null
             }
             """;
 
@@ -192,8 +189,8 @@ public class CommentControllerTest {
         String invalidRatingJson = """
             {
                 "bookingId": 1,
-                "text": "Comentario con rating inválido",
-                "rating": 6
+                "rating": 6,
+                "text": "Comentario con rating inválido"
             }
             """;
 
@@ -211,8 +208,8 @@ public class CommentControllerTest {
         String invalidRatingJson = """
             {
                 "bookingId": 1,
-                "text": "Comentario con rating inválido", 
-                "rating": 0
+                "rating": 0,
+                "text": "Comentario con rating inválido"
             }
             """;
 
@@ -230,8 +227,8 @@ public class CommentControllerTest {
         String validCommentJson = """
             {
                 "bookingId": 99999,
-                "text": "Excelente lugar, muy recomendado",
-                "rating": 5
+                "rating": 5,
+                "text": "Excelente lugar, muy recomendado"
             }
             """;
 
@@ -243,6 +240,15 @@ public class CommentControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value(true))
                 .andExpect(jsonPath("$.content").value("Reserva no encontrada"));
+    }
+
+    @Test
+    void createCommentSuccessfulTest() throws Exception {
+        // ✅ CREAR RESERVA Y COMENTARIO REAL
+        Long commentId = crearComentarioDePrueba();
+        
+        // Verificar que se creó correctamente
+        assert commentId != null && commentId > 0;
     }
 
     // ========================== TESTS DE RESPUESTAS A COMENTARIOS ==========================
@@ -263,12 +269,9 @@ public class CommentControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-
-    //NO PASA
     @Test
     void replyToCommentAsNonHostTest() throws Exception {
-        // Primero necesitamos crear un comentario de prueba
-        // Esto requiere una reserva completada, así que lo simulamos
+        // ✅ CREAR COMENTARIO REAL
         Long existingCommentId = crearComentarioDePrueba();
 
         String replyJson = """
@@ -307,10 +310,9 @@ public class CommentControllerTest {
                 .andExpect(jsonPath("$.content").value("Comentario no encontrado"));
     }
 
-    //NO PASA
     @Test
     void replyToCommentSuccessfulTest() throws Exception {
-        // Primero crear un comentario de prueba
+        // ✅ CREAR COMENTARIO REAL
         Long existingCommentId = crearComentarioDePrueba();
 
         String replyJson = """
@@ -338,10 +340,9 @@ public class CommentControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    //NO PASA
     @Test
     void getCommentsByPlaceSuccessfulTest() throws Exception {
-        // Crear algunos comentarios primero
+        // ✅ CREAR COMENTARIO REAL
         crearComentarioDePrueba();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/place/{placeId}", testPlaceId)
@@ -352,7 +353,6 @@ public class CommentControllerTest {
                 .andExpect(jsonPath("$.content").isArray());
     }
 
-    //NO PASA
     @Test
     void getCommentsByNonExistentPlaceTest() throws Exception {
         Long nonExistentPlaceId = 99999L;
@@ -360,16 +360,15 @@ public class CommentControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/place/{placeId}", nonExistentPlaceId)
                         .header("Authorization", "Bearer " + guestToken))
                 .andDo(print())
-                .andExpect(status().isOk()) // Debería devolver array vacío, no error
+                .andExpect(status().isOk()) 
                 .andExpect(jsonPath("$.error").value(false))
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(0));
     }
 
-    //NO PASA
     @Test
     void getCommentsByPlaceWithCommentsTest() throws Exception {
-        // Crear comentarios de prueba
+        // ✅ CREAR COMENTARIO REAL
         Long commentId1 = crearComentarioDePrueba();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/place/{placeId}", testPlaceId)
@@ -388,20 +387,19 @@ public class CommentControllerTest {
 
     @Test
     void getAverageRatingWithoutAuthenticationTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/average-rating/{placeId}", testPlaceId))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/place/{placeId}/average-rating", testPlaceId))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
 
-    //NO PASA
     @Test
     void getAverageRatingSuccessfulTest() throws Exception {
-        // Crear comentarios con diferentes ratings
+        // ✅ CREAR COMENTARIOS REALES CON DIFERENTES RATINGS
         crearComentarioConRating(5);
         crearComentarioConRating(3);
         crearComentarioConRating(4);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/average-rating/{placeId}", testPlaceId)
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/place/{placeId}/average-rating", testPlaceId)
                         .header("Authorization", "Bearer " + guestToken))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -409,46 +407,38 @@ public class CommentControllerTest {
                 .andExpect(jsonPath("$.content").value(4.0)); // (5+3+4)/3 = 4.0
     }
 
-    //NO PASA
     @Test
     void getAverageRatingForNonExistentPlaceTest() throws Exception {
         Long nonExistentPlaceId = 99999L;
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/average-rating/{placeId}", nonExistentPlaceId)
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/place/{placeId}/average-rating", nonExistentPlaceId)
                         .header("Authorization", "Bearer " + guestToken))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.error").value(false))
-                .andExpect(jsonPath("$.content").value(0.0)); // Rating promedio 0 para lugar sin comentarios
+                .andExpect(jsonPath("$.content").value(0.0));
     }
 
-    //NO PASA
     @Test
     void getAverageRatingForPlaceWithNoCommentsTest() throws Exception {
-        // Crear un nuevo place sin comentarios
+        // ✅ CREAR NUEVO PLACE
         CreatePlaceDTO newPlaceDTO = new CreatePlaceDTO(
                 "Place Sin Comentarios",
-                "Descripción",
+                "Descripción lugar sin comentarios",
                 2,
                 80000.0f,
                 List.of("https://example.com/image.jpg"),
                 null,
                 List.of(Service.WIFI),
                 4.7110,
-                -74.0721
+                -74.0721,
+                "bogota",
+                "km 5"
         );
 
-        placeService.create(newPlaceDTO, hostEmail);
+        Long newPlaceId = placeService.create(newPlaceDTO, hostEmail);
 
-        // Obtener el ID del nuevo place
-        var places = placeService.getPlacesUser(hostEmail);
-        Long newPlaceId = places.stream()
-                .filter(p -> p.title().equals("Place Sin Comentarios"))
-                .findFirst()
-                .map(p -> p.id())
-                .orElse(null);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/average-rating/{placeId}", newPlaceId)
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/comments/place/{placeId}/average-rating", newPlaceId)
                         .header("Authorization", "Bearer " + guestToken))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -459,22 +449,74 @@ public class CommentControllerTest {
     // ========================== MÉTODOS AUXILIARES ==========================
 
     /**
-     * Método auxiliar para crear un comentario de prueba
-     * En un entorno real, esto requeriría una reserva completada
+     * ✅ MÉTODO AUXILIAR REAL PARA CREAR COMENTARIO DE PRUEBA
      */
     private Long crearComentarioDePrueba() throws Exception {
-        // En un entorno de prueba real, necesitarías:
-        // 1. Una reserva completada
-        // 2. Usar el commentService para crear el comentario
+        if (testPlaceId == null) {
+            throw new IllegalStateException("testPlaceId no puede ser null");
+        }
 
-        // Por ahora, simulamos que existe un comentario
-        // En la práctica, necesitarías configurar datos de prueba en la BD
-        return 1L;
+        System.out.println("🔧 Creando reserva para place ID: " + testPlaceId);
+
+        // ✅ CREAR RESERVA REAL
+        CreateBookingDTO bookingDTO = new CreateBookingDTO(
+            LocalDate.now().plusDays(1),
+            LocalDate.now().plusDays(3),
+            testPlaceId,
+            2
+        );
+        
+        Long bookingId = bookingService.create(bookingDTO, guestEmail);
+        System.out.println("✅ Reserva creada con ID: " + bookingId);
+        
+        // ✅ FLUJO CORRECTO: PENDING → CONFIRMED → COMPLETED
+        bookingService.updateStatus(bookingId, BookingStatus.CONFIRMED, hostEmail);
+        System.out.println("✅ Reserva marcada como CONFIRMED");
+        
+        bookingService.updateStatus(bookingId, BookingStatus.COMPLETED, hostEmail);
+        System.out.println("✅ Reserva marcada como COMPLETED");
+        
+        // ✅ CREAR COMENTARIO REAL
+        CreateCommentDTO commentDTO = new CreateCommentDTO(
+            bookingId,
+            5,
+            "Excelente lugar para pruebas"
+        );
+        
+        CommentDTO createdComment = commentService.createComment(commentDTO, guestEmail);
+        System.out.println("✅ Comentario creado con ID: " + createdComment.id());
+        
+        return createdComment.id();
     }
 
+    /**
+     * ✅ CREAR COMENTARIO CON RATING ESPECÍFICO
+     */
     private Long crearComentarioConRating(int rating) throws Exception {
-        // Similar al método anterior pero con rating específico
-        // En la práctica, necesitarías crear comentarios reales en la BD
-        return (long) rating;
+        if (testPlaceId == null) {
+            throw new IllegalStateException("testPlaceId no puede ser null");
+        }
+
+        CreateBookingDTO bookingDTO = new CreateBookingDTO(
+            LocalDate.now().plusDays(1),
+            LocalDate.now().plusDays(3),
+            testPlaceId,
+            2
+        );
+        
+        Long bookingId = bookingService.create(bookingDTO, guestEmail);
+        
+        // ✅ FLUJO CORRECTO: PENDING → CONFIRMED → COMPLETED
+        bookingService.updateStatus(bookingId, BookingStatus.CONFIRMED, hostEmail);
+        bookingService.updateStatus(bookingId, BookingStatus.COMPLETED, hostEmail);
+        
+        CreateCommentDTO commentDTO = new CreateCommentDTO(
+            bookingId,
+            rating,
+            "Comentario con rating " + rating
+        );
+        
+        CommentDTO createdComment = commentService.createComment(commentDTO, guestEmail);
+        return createdComment.id();
     }
 }

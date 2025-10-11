@@ -20,6 +20,8 @@ public record CreatePlaceDTO(
         @Size(max = 10) List<MultipartFile> imageFiles,
         @NotEmpty List<Service> services,
         @NotNull Double latitude,
-        @NotNull Double longitude
+        @NotNull Double longitude,
+        String address,
+        String city
 ) {
 }

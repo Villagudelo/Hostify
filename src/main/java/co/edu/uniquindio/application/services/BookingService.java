@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface BookingService {
 
-    void create(CreateBookingDTO createBookingDTO, String email) throws Exception;
+    Long create(CreateBookingDTO createBookingDTO, String email) throws Exception;
 
     void changeStatus(Long id, StatusBookingDTO statusBookingDTO) throws Exception;
 
@@ -28,4 +28,7 @@ public interface BookingService {
     List<ItemBookingDTO> getBookingsUser(String email, BookingStatus status, int page, int size) throws Exception;
 
     List<ItemBookingDTO> getBookingsByPlace(Long placeId, BookingStatus status, LocalDateTime from, LocalDateTime to, String hostEmail, int page, int size) throws Exception;
+
+    void updateStatus(Long bookingId, BookingStatus newStatus, String userEmail) throws Exception;
+
 }

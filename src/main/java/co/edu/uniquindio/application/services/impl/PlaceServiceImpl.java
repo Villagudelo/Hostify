@@ -32,7 +32,7 @@ public class PlaceServiceImpl implements PlaceService {
     private final ImageService imageService;
 
     @Override
-    public void create(CreatePlaceDTO placeDTO, String hostEmail) throws Exception {
+    public Long create(CreatePlaceDTO placeDTO, String hostEmail) throws Exception {
         List<String> finalImages = new ArrayList<>();
 
         if (placeDTO.imageFiles() != null && !placeDTO.imageFiles().isEmpty()) {
@@ -53,8 +53,7 @@ public class PlaceServiceImpl implements PlaceService {
         if (finalImages.size() < 1 || finalImages.size() > 10) {
             throw new ValidationException("Debes subir entre 1 y 10 imágenes");
         }
-        
-    
+
         User host = userRepository.findByEmail(hostEmail)
             .orElseThrow(() -> new NotFoundException("Anfitrión no encontrado"));
 
@@ -67,10 +66,15 @@ public class PlaceServiceImpl implements PlaceService {
         place.setServices(placeDTO.services());
         place.setHost(host);
         place.setStatus(co.edu.uniquindio.application.model.enums.Status.ACTIVE);
-
         place.setLatitude(placeDTO.latitude());
         place.setLongitude(placeDTO.longitude());
-        placeRepository.save(place);
+        place.setCity(placeDTO.city());
+        place.setAddress(placeDTO.address());
+        
+        
+        // ✅ GUARDAR Y RETORNAR EL ID
+        Place savedPlace = placeRepository.save(place);
+        return savedPlace.getId();
     }
 
     @Override

@@ -27,7 +27,7 @@ public class BookingServiceImpl implements BookingService {
     private final EmailService emailService;
 
     @Override
-    public void create(CreateBookingDTO createBookingDTO, String email) throws Exception {
+    public Long create(CreateBookingDTO createBookingDTO, String email) throws Exception {
         Place place = placeRepository.findById(createBookingDTO.placeId())
                 .orElseThrow(() -> new ValidationException("Alojamiento no encontrado"));
 
@@ -37,7 +37,7 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime checkIn = createBookingDTO.checkIn().atStartOfDay();
         LocalDateTime checkOut = createBookingDTO.checkOut().atStartOfDay();
 
-        // Validaciones
+        // Validaciones existentes
         if (checkIn.isBefore(LocalDateTime.now()) || checkOut.isBefore(LocalDateTime.now())) {
             throw new ValidationException("No se pueden reservar fechas pasadas");
         }
@@ -63,8 +63,10 @@ public class BookingServiceImpl implements BookingService {
         booking.setCheckOut(checkOut);
         booking.setGuestCount(createBookingDTO.guestCount());
 
-        bookingRepository.save(booking);
+        Booking savedBooking = bookingRepository.save(booking);
         emailService.sendBookingConfirmation(guest.getEmail(), booking);
+        
+        return savedBooking.getId(); // ✅ RETORNAR ID
     }
 
     @Override
@@ -184,6 +186,41 @@ public class BookingServiceImpl implements BookingService {
         }
 
         booking.setStatus(BookingStatus.REJECTED);
+        bookingRepository.save(booking);
+    }
+
+    @Override
+    public void updateStatus(Long bookingId, BookingStatus newStatus, String userEmail) throws Exception {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
+
+        // Validar permisos según el estado
+        switch (newStatus) {
+            case CONFIRMED -> {
+                if (!booking.getPlace().getHost().getEmail().equals(userEmail)) {
+                    throw new ValidationException("Solo el anfitrión puede confirmar reservas");
+                }
+                if (booking.getStatus() != BookingStatus.PENDING) {
+                    throw new ValidationException("Solo reservas pendientes pueden ser confirmadas");
+                }
+            }
+            case COMPLETED -> {
+                if (!booking.getPlace().getHost().getEmail().equals(userEmail)) {
+                    throw new ValidationException("Solo el anfitrión puede marcar reservas como completadas");
+                }
+                if (booking.getStatus() != BookingStatus.CONFIRMED) {
+                    throw new ValidationException("Solo reservas confirmadas pueden ser completadas");
+                }
+            }
+            case CANCELLED -> {
+                if (!booking.getGuest().getEmail().equals(userEmail)) {
+                    throw new ValidationException("Solo el huésped puede cancelar su reserva");
+                }
+            }
+            default -> throw new ValidationException("Estado de reserva inválido");
+        }
+
+        booking.setStatus(newStatus);
         bookingRepository.save(booking);
     }
 }

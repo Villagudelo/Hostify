@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface PlaceService {
 
-    void create(CreatePlaceDTO placeDTO, String hostEmail) throws Exception;
+    Long create(CreatePlaceDTO placeDTO, String hostEmail) throws Exception;
 
     void edit(Long id, EditPlaceDTO placeDTO, String hostEmail) throws Exception;
 

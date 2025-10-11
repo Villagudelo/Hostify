@@ -12,6 +12,9 @@ public record PlaceDTO(
         List<Service> services,
         String hostName,
         Double latitude,
-        Double longitude
+        Double longitude,
+        String address,
+        String city
+
 ) {
 }
